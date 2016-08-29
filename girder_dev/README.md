@@ -28,9 +28,17 @@ docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}
 ```
 
 If you follow `http://localhost:8080/` you should be greeted by Girder's
-homepage. Create a user acount, first one has always admin priviledges.
-Go to `http://localhost:8080/#plugins` and enable ythub plugin. After mandatory
-server restart (big red button on top of the plugin page), go to configuration
-page of the ythub plugin `http://localhost:8080/#plugins/ythub/config`. Set
-`tmpnb URL` to `http://proxy:8000/`. You should be good to go at this point,
-enjoy!
+homepage. 
+
+ 1. Create a user acount, first one has always admin priviledges.
+ 
+ 2. Go to `http://localhost:8080/#plugins` and enable ythub plugin. After
+    mandatory server restart (big red button on top of the plugin page), go to
+    configuration page of the ythub plugin
+    `http://localhost:8080/#plugins/ythub/config`. Set `tmpnb URL` to
+    `http://proxy:8000/`. 
+
+ 3. Go to `http://localhost:8080/#assetstores` and create default filesysystem
+    assetstore with path: `/mnt/girder`
+
+You should be good to go at this point, enjoy!
