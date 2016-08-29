@@ -33,6 +33,8 @@ services:
     image: xarthisius/volman:fuse
     container_name: volman
     env_file: tmpnb.env
+    volumes_from:
+      - girder
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /:/host
