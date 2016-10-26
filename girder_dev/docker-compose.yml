@@ -30,7 +30,7 @@ services:
     command: "--default-target http://volman:9005 --api-ip proxy"
 
   volman:
-    image: xarthisius/volman:fuse
+    image: xarthisius/volman:sc16
     container_name: volman
     env_file: tmpnb.env
     volumes_from:
