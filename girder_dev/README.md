@@ -36,7 +36,7 @@ homepage.
     mandatory server restart (big red button on top of the plugin page), go to
     configuration page of the ythub plugin
     `http://localhost:8080/#plugins/ythub/config`. Set `tmpnb URL` to
-    `http://proxy:8000/`. 
+    `http://proxy:8000/`. Hit 'Generate Key' button, set heartbeat to 15.
 
  3. Go to `http://localhost:8080/#assetstores` and create default filesysystem
     assetstore with path: `/mnt/girder`
