@@ -1,7 +1,7 @@
-FROM node:4.4.5
+FROM node:5
 MAINTAINER Patrick Reynolds <patrick.reynolds@kitware.com>
 
-EXPOSE 80
+EXPOSE 8080
 
 RUN apt-get update && apt-get install -qy software-properties-common python-software-properties && \
   apt-get update && apt-get install -qy \
@@ -20,9 +20,8 @@ RUN git clone https://github.com/whole-tale/girder_ythub /girder/plugins/ythub
 WORKDIR /girder
 
 RUN pip install -e .[plugins]
-
-RUN npm install -g grunt-cli && npm cache clear
-RUN npm install --production --unsafe-perm && npm cache clear
+RUN npm install --unsafe-perm && npm cache clear
+RUN npm run build -- --plugins='ythub,oauth,mongo_search,homepage'
 
 COPY ./girder.local.cfg /girder/girder/conf/girder.local.cfg
 
