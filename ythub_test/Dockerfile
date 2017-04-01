@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -qy software-properties-common python-soft
 RUN wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py
 
 RUN git clone https://github.com/data-exp-lab/girder
-RUN echo '22'
+RUN echo '24'
 RUN git clone https://github.com/data-exp-lab/girder_ythub /girder/plugins/ythub
 
 WORKDIR /girder

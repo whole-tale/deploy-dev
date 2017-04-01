@@ -31,13 +31,7 @@ docker-compose up -d mongodb
 docker-compose up -d
 ```
 
-Add the output of the following command to your `/etc/hosts`
-
-```
-docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}} {{.Name}}' proxy girder || tr '/' ' '
-```
-
-Lastly, run `python setup_girder.py`.
+Finally, run `python setup_girder.py`.
 
 If you follow `http://localhost:8080/` you should be greeted by Girder's
 homepage.
