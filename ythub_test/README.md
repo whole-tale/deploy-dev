@@ -35,3 +35,11 @@ Finally, run `python setup_girder.py`.
 
 If you follow `http://localhost:8080/` you should be greeted by Girder's
 homepage.
+
+If you updated `setup_girder.py` and want to rerun it, do the following:
+
+```
+docker-compose stop -t 0 girder
+docker-compose exec -T mongodb mongo girder --eval "db.dropDatabase()"
+docker-compose up -d girder
+```
