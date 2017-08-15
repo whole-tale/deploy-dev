@@ -6,4 +6,4 @@ RUN girder-install web --all-plugins
 
 COPY ./girder.local.cfg /girder/girder/conf/girder.local.cfg
 
-ENTRYPOINT ["python", "-m", "girder"]
+ENTRYPOINT ["python3", "-m", "girder"]
