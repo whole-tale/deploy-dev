@@ -1,0 +1,47 @@
+graceTimeOut = "10s"
+debug = false
+checkNewVersion = false
+logLevel = "INFO"
+
+# If set to true invalid SSL certificates are accepted for backends.
+# Note: This disables detection of man-in-the-middle attacks so should only be used on secure backend networks.
+# Optional
+# Default: false
+#
+# InsecureSkipVerify = true
+
+defaultEntryPoints = ["http"]
+
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+
+[web]
+address = ":8080"
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "vcap.me"
+watch = true
+exposedbydefault = true
+swarmmode = true
+
+[accessLog]
+  filePath = "/etc/traefik/access.log"
+  format = "json"
+
+  [accessLog.filters]
+    statusCodes = ["200", "300-302"]
+    retryAttempts = true
+
+  [accessLog.fields]
+    defaultMode = "keep"
+    [accessLog.fields.names]
+      "ClientUsername" = "drop"
+
+    [accessLog.fields.headers]
+      defaultMode = "keep"
+      [accessLog.fields.headers.names]
+        "User-Agent" = "redact"
+        "Authorization" = "drop"
+        "Content-Type" = "keep"
