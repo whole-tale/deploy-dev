@@ -40,7 +40,8 @@ r = requests.post(api_url + '/assetstore', headers=headers,
                           'shard': False, 'replicaset': None})
 
 print('Enabling plugins')
-plugins = ['jobs', 'oauth', 'worker', 'wt_data_manager', 'wholetale', 'gravatar']
+plugins = ['oauth', 'gravatar', 'jobs', 'worker', 'wt_data_manager',
+           'wholetale', 'wt_home_dir']
 r = requests.put(
     api_url + '/system/plugins', headers=headers,
     params={'plugins': json.dumps(plugins)})
