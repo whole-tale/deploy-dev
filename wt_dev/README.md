@@ -3,8 +3,8 @@ Setting up local testing instance of Girder
 
 Requirements:
 
- * docker >= 18.04
- * GitHub app OAuth credentials with callback set to `http://girder.vcap.me/api/v1/oauth/github/callback`.
+ * docker 17.04.0+
+ * [GitHub OAuth App](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/) credentials with callback set to `http://girder.vcap.me/api/v1/oauth/github/callback`.
    Export them using env variables:
    * GITHUB_CLIENT_ID
    * GITHUB_CLIENT_SECRET
