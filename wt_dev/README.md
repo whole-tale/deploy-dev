@@ -8,6 +8,11 @@ Requirements:
    Export them using env variables:
    * GITHUB_CLIENT_ID
    * GITHUB_CLIENT_SECRET
+ * default user (uid:1000, gid:100)
+   ```
+   [[ -z $(getent group 100) ]] && sudo groupadd -g 100 wtgroup
+   [[ -z $(getent passwd 1000) ]] && sudo useradd -g 100 -u 1000 wtuser
+   ```
 
 Clone this repository:
 
