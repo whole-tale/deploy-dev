@@ -1,0 +1,136 @@
+version: '3.2'
+
+services:
+  traefik:
+    image: traefik:alpine
+    ports:
+      - "80:80"
+      - "8080:8080"
+    networks:
+      - traefik-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik:/etc/traefik
+    deploy:
+      replicas: 1
+
+  mongo:
+    image: mongo:3.2
+    networks:
+      - mongo
+    volumes:
+      - mongo-data:/data/db
+      - mongo-cfg:/data/configdb
+    deploy:
+      replicas: 1
+
+
+  girder:
+    image: wholetale/girder:latest
+    networks:
+      - celery
+      - traefik-net
+      - mongo
+    volumes:
+      - ./homes:/tmp/wt-home-dirs
+      - ./homes:/tmp/wt-tale-dirs
+      - ./ps:/tmp/ps
+      - ./girder/girder.local.cfg:/girder/girder/conf/girder.local.cfg
+    environment:
+      - DOMAIN=vcap.me
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.frontend.rule=Host:girder.vcap.me"
+        - "traefik.port=8080"
+        - "traefik.enable=true"
+        - "traefik.docker.network=wt_traefik-net"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http"
+
+  redis:
+    image: redis
+    networks:
+      - celery
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=false"
+
+  dashboard:
+    image: wholetale/dashboard:latest
+    networks:
+      - traefik-net
+    environment:
+      - GIRDER_API_URL=http://girder.vcap.me
+      - AUTH_PROVIDER=GitHub
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.port=80"
+        - "traefik.frontend.rule=Host:dashboard.vcap.me"
+        - "traefik.enable=true"
+        - "traefik.docker.network=wt_traefik-net"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=http"
+
+  registry:
+    image: registry:2.6
+    ports:
+      - 443:443
+    networks:
+      - celery
+    volumes:
+      - ./registry:/var/lib/registry
+      - ./registry/auth:/auth:ro
+      - ./traefik/certs:/certs
+    environment:
+      - REGISTRY_AUTH=htpasswd
+      - REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm"
+      - REGISTRY_AUTH_HTPASSWD_PATH=/auth/registry.password
+      - REGISTRY_HTTP_ADDR=0.0.0.0:443
+      - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/dev.crt
+      - REGISTRY_HTTP_TLS_KEY=/certs/dev.key
+    deploy:
+      replicas: 1
+
+#  celery_worker:
+#    image: wholetale/gwvolman
+#    networks:
+#      - celery
+#    labels:
+#      - "traefik.enable=false"
+#    environment:
+#      - GIRDER_API_URL=http://girder.vcap.me/api/v1
+#      - HOSTDIR=/host
+#      - DOMAIN=vcap.me
+#      - TRAEFIK_NETWORK=wt_traefik-net
+#      - TRAEFIK_ENTRYPOINT=http
+#      - REGISTRY_USER=fido
+#      - REGISTRY_URL=https://registry.vcap.me
+#      - REGISTRY_PASS=secretpass
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+#      - /:/host
+#      - /var/cache/davfs2:/var/cache/davfs2
+#      - /run/mount.davfs:/run/mount.davfs
+#    cap_add:
+#      - SYS_ADMIN
+#      - SYS_PTRACE
+#    devices:
+#      - /dev/fuse:/dev/fuse
+#    command: -Q manager,celery,xa3bl9runqzk8dgbl5gc6nlnq --hostname=xa3bl9runqzk8dgbl5gc6nlnq
+
+
+networks:
+  traefik-net:
+    driver: overlay
+  mongo:
+    driver: overlay
+  celery:
+    driver: overlay
+    attachable: true
+
+volumes:
+  mongo-data: {}
+  mongo-cfg: {}
