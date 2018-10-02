@@ -67,6 +67,14 @@ settings = [
         'key': 'core.cors.allow_origin',
         'value': 'http://dashboard.vcap.me,http://localhost:4200'
     }, {
+        'key': 'core.cors.allow_headers',
+        'value': (
+            'Accept-Encoding, Authorization, Content-Disposition, Set-Cookie, '
+            'Content-Type, Cookie, Girder-Authorization, Girder-Token, '
+            'X-Requested-With, X-Forwarded-Server, X-Forwarded-For, '
+            'X-Forwarded-Host, Remote-Addr, Cache-Control'
+        )
+    }, {
         'key': 'worker.api_url',
         'value': 'http://girder:8080/api/v1'
     }, {
