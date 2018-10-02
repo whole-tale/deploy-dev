@@ -1,5 +1,5 @@
-Setting up local testing instance of Girder
-===========================================
+Setting up a local instance of Whole Tale
+=========================================
 
 Requirements:
 
