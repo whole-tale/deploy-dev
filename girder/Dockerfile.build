@@ -1,5 +1,0 @@
-FROM girder/girder:1.5.3_dev
-
-RUN git clone https://github.com/data-exp-lab/girder_ythub /girder/plugins/ythub
-RUN npm install --production --unsafe-perm && npm cache clear
-COPY ./girder.local.cfg /girder/girder/conf/girder.local.cfg
