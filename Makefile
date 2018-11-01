@@ -1,5 +1,5 @@
 .PHONY: clean dirs dev images
-SUBDIRS = ps homes
+SUBDIRS = ps homes src
 
 images:
 	docker pull traefik:alpine
@@ -10,15 +10,32 @@ images:
 	docker pull wholetale/dashboard:latest
 	docker pull wholetale/gwvolman:latest
 
+sources:
+	git clone https://github.com/whole-tale/gwvolman src/gwvolman
+	git clone https://github.com/whole-tale/girder_wholetale src/wholetale
+	git clone https://github.com/whole-tale/girder_wt_data_manager src/wt_data_manager
+	git clone https://github.com/whole-tale/wt_home_dirs src/wt_home_dir
+
 dirs: $(SUBDIRS)
 
 $(SUBDIRS):
 	@mkdir $@
 
-dev: dirs images
+services: dirs sources images
+
+dev:
 	docker stack deploy --compose-file=docker-stack.yml wt
 	./run_worker.sh
 	./setup_girder.py
+	cid=$$(docker ps --filter=name=wt_girder -q);
+	while [ -z $${cid} ] ; do \
+		  echo $${cid} ; \
+		  sleep 1 ; \
+	    cid=$$(docker ps --filter=name=wt_girder -q) ; \
+	done; \
+	true
+	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -e /gwvolman
+	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir
 
 clean:
 	-./stop_worker.sh

@@ -36,6 +36,10 @@ services:
       - ./homes:/tmp/wt-tale-dirs
       - ./ps:/tmp/ps
       - ./girder/girder.local.cfg:/girder/girder/conf/girder.local.cfg
+      - ./src/wt_data_manager:/girder/plugins/wt_data_manager
+      - ./src/wt_home_dir:/girder/plugins/wt_home_dir
+      - ./src/wholetale:/girder/plugins/wholetale
+      - ./src/gwvolman:/gwvolman
     environment:
       - DOMAIN=vcap.me
     deploy:

@@ -26,6 +26,7 @@ docker run \
     -v /:/host \
     -v /var/cache/davfs2:/var/cache/davfs2 \
     -v /run/mount.davfs:/run/mount.davfs \
+    -v $PWD/src/gwvolman:/gwvolman \
     --device /dev/fuse \
     --cap-add SYS_ADMIN \
     --cap-add SYS_PTRACE \
