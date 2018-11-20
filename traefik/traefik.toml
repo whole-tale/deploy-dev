@@ -10,18 +10,40 @@ logLevel = "INFO"
 #
 # InsecureSkipVerify = true
 
-defaultEntryPoints = ["http"]
+defaultEntryPoints = ["http", "https"]
 
 [entryPoints]
   [entryPoints.http]
   address = ":80"
+    [entryPoints.http.redirect]
+       entryPoint = "https"
+  [entryPoints.https]
+  address = ":443"
+    [entryPoints.https.tls]
+    #MinVersion = "VersionTLS12"
+    #CipherSuites = ["TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305"]
+    MinVersion = "VersionTLS10"
+    CipherSuites = ["TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305", "TLS_RSA_WITH_AES_128_CBC_SHA", "TLS_RSA_WITH_AES_256_CBC_SHA"]
 
 [web]
 address = ":8080"
 
+[acme]
+email = "bgates@microsoft.com"   # FIXME
+storage = "/acme/acme.json"
+entryPoint = "https"
+acmeLogging = true
+
+[acme.dnsChallenge]
+provider = "godaddy"
+delayBeforeCheck = 1800
+
+[[acme.domains]]
+main = "*.local.wholetale.org"
+
 [docker]
 endpoint = "unix:///var/run/docker.sock"
-domain = "vcap.me"
+domain = "local.wholetale.org"
 watch = true
 exposedbydefault = true
 swarmmode = true

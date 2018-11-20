@@ -17,7 +17,7 @@ headers = {
     'Accept': 'application/json'
 }
 
-api_url = 'http://girder.vcap.me/api/v1'
+api_url = 'https://girder.local.wholetale.org/api/v1'
 
 # Give girder time to start
 while True:
@@ -65,7 +65,7 @@ print('Setting up Plugin')
 settings = [
     {
         'key': 'core.cors.allow_origin',
-        'value': 'http://dashboard.vcap.me,http://localhost:4200'
+        'value': 'https://dashboard.local.wholetale.org,http://localhost:4200'
     }, {
         'key': 'core.cors.allow_headers',
         'value': (
@@ -120,7 +120,7 @@ i_params = {
             '--NotebookApp.token={token} --NotebookApp.base_url=/{base_path} '
             '--NotebookApp.port_retries=0'
         ),
-        'environment': ['CSP_HOSTS=dashboard.vcap.me'],
+        'environment': ['CSP_HOSTS=dashboard.local.wholetale.org'],
         'memLimit': '2048m',
         'port': 8888,
         'targetMount': '/home/jovyan/work',
@@ -148,6 +148,6 @@ r = requests.put(api_url + '/image/{_id}/build'.format(**image),
 r.raise_for_status()
 
 print('-------------- You should be all set!! -------------')
-print('try going to http://girder.vcap.me:8080 and log in with: ')
+print('try going to https://girder.local.wholetale.org and log in with: ')
 print('  user : %s' % params['login'])
 print('  pass : %s' % params['password'])

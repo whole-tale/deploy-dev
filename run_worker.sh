@@ -1,6 +1,6 @@
 #!/bin/sh
 
-domain=vcap.me
+domain=local.wholetale.org
 role=manager,celery
 image=wholetale/gwvolman:latest
 registry_user=fido
@@ -16,9 +16,9 @@ docker run \
     --name celery_worker \
     --label traefik.enable=false \
     -e HOSTDIR=/host \
-    -e DOMAIN=vcap.me \
+    -e DOMAIN=local.wholetale.org \
     -e TRAEFIK_NETWORK=wt_traefik-net \
-    -e TRAEFIK_ENTRYPOINT=http \
+    -e TRAEFIK_ENTRYPOINT=https \
     -e REGISTRY_USER=${registry_user} \
     -e REGISTRY_URL=https://registry.${domain} \
     -e REGISTRY_PASS=${registry_pass} \
@@ -26,7 +26,7 @@ docker run \
     -v /:/host \
     -v /var/cache/davfs2:/var/cache/davfs2 \
     -v /run/mount.davfs:/run/mount.davfs \
-    -v $PWD/src/gwvolman:/gwvolman \
+    -v /home/core/gwvolman:/gwvolman \
     --device /dev/fuse \
     --cap-add SYS_ADMIN \
     --cap-add SYS_PTRACE \
