@@ -84,14 +84,14 @@ settings = [
         'key': 'worker.backend',
         'value': 'redis://redis/'
     }, {
-        'key': 'oauth.github_client_id',
-        'value': os.environ.get('GITHUB_CLIENT_ID')
+        'key': 'oauth.globus_client_id',
+        'value': os.environ.get('GLOBUS_CLIENT_ID')
     }, {
-        'key': 'oauth.github_client_secret',
-        'value': os.environ.get('GITHUB_CLIENT_SECRET')
+        'key': 'oauth.globus_client_secret',
+        'value': os.environ.get('GLOBUS_CLIENT_SECRET')
     }, {
         'key': 'oauth.providers_enabled',
-        'value': ['github']
+        'value': ['Globus']
     }
 ]
 
@@ -99,9 +99,9 @@ r = requests.put(api_url + '/system/setting', headers=headers,
                  params={'list': json.dumps(settings)})
 r.raise_for_status()
 
-print('Create a single recipe')
+print('Create a Jupyter recipe')
 r_params = {
-    'commitId': 'b5d691103d0b9e84a94c6611a6439bf6a82ad528',
+    'commitId': 'b74501c486021cbd74da50e7abc901ba325e0801',
     'description': 'Jupyter with iframe support (env)',
     'name': 'whole-tale/jupyter-yt',
     'public': True,
@@ -112,7 +112,7 @@ r = requests.post(api_url + '/recipe', headers=headers,
 r.raise_for_status()
 recipe = r.json()
 
-print('Create a single image')
+print('Create a Jupyter image')
 i_params = {
     'config': json.dumps({
         'command': (
@@ -134,6 +134,49 @@ i_params = {
     ),
     'iframe': True,
     'name': 'Jupyter Notebook',
+    'public': True,
+    'recipeId': recipe['_id'],
+}
+r = requests.post(api_url + '/image', headers=headers,
+                  params=i_params)
+r.raise_for_status()
+image = r.json()
+
+print('Starting image build (this will take a while)...')
+r = requests.put(api_url + '/image/{_id}/build'.format(**image),
+                 headers=headers)
+r.raise_for_status()
+
+print('Create an RStudio recipe')
+r_params = {
+    'commitId': '1728ada20a6738fdc75291fc2173d34352faa0a9',
+    'description': 'RStudio with iframe support (env)',
+    'name': 'rocker_rstudio',
+    'public': True,
+    'url': 'https://github.com/whole-tale/rstudio-base'
+}
+r = requests.post(api_url + '/recipe', headers=headers,
+                  params=r_params)
+r.raise_for_status()
+recipe = r.json()
+
+print('Create an RStudio image')
+i_params = {
+    'config': json.dumps({
+        'command': '/init',
+        'environment': ['CSP_HOSTS=dashboard.local.wholetale.org',
+                        'PASSWORD=djkslajdklasjdklsajd'],
+        'memLimit': '2048m',
+        'port': 8787,
+        'targetMount': '/home/rstudio/work',
+        'urlPath': '',
+        'user': 'rstudio'
+    }),
+    'fullName': 'xarthisius/rstudio',
+    'icon': 'https://www.rstudio.com/wp-content/uploads/'
+            '2014/06/RStudio-Ball.png',
+    'iframe': True,
+    'name': 'RStudio 3.5.1',
     'public': True,
     'recipeId': recipe['_id'],
 }

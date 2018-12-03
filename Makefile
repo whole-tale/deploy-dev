@@ -26,7 +26,6 @@ services: dirs sources images
 dev:
 	docker stack deploy --compose-file=docker-stack.yml wt
 	./run_worker.sh
-	./setup_girder.py
 	cid=$$(docker ps --filter=name=wt_girder -q);
 	while [ -z $${cid} ] ; do \
 		  echo $${cid} ; \
@@ -36,9 +35,9 @@ dev:
 	true
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -e /gwvolman
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir
+	./setup_girder.py
 
 clean:
 	-./stop_worker.sh
 	-docker stack rm wt
 	-docker volume rm wt_mongo-cfg wt_mongo-data
-
