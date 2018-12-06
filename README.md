@@ -81,12 +81,12 @@ $ docker ps | grep celery_worker
 0e8124024f03        wholetale/gwvolman:latest                                "python3 -m girder_w…"   15 hours ago        Up 15 hours                             celery_worker
 ```
 
-Note: If you're running in a VM, you'll need to setup  forwarding for port 80 (requires `sudo`):
+Note: If you're running in a VM, you'll need to setup  forwarding for port 443 (requires `sudo`):
 ```
-$ sudo ssh -L 80:localhost:80 user@VM
+$ sudo ssh -L 443:localhost:443 user@VM
 ```
 
-You should now be able to open a browser to http://dashboard.local.wholetale.org to access your running instance of Whole Tale.
+You should now be able to open a browser to https://dashboard.local.wholetale.org to access your running instance of Whole Tale.
 
 Uninstall
 ---------
