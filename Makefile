@@ -39,5 +39,6 @@ dev:
 
 clean:
 	-./stop_worker.sh
+	-./destroy_instances.py
 	-docker stack rm wt
 	-docker volume rm wt_mongo-cfg wt_mongo-data
