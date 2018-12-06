@@ -3,6 +3,7 @@ import json
 import requests
 import time
 import os
+import sys
 
 params = {
     'login': 'admin',
@@ -17,6 +18,12 @@ headers = {
     'Accept': 'application/json'
 }
 
+def final_msg():
+    print('-------------- You should be all set!! -------------')
+    print('try going to https://girder.local.wholetale.org and log in with: ')
+    print('  user : %s' % params['login'])
+    print('  pass : %s' % params['password'])
+
 api_url = 'https://girder.local.wholetale.org/api/v1'
 
 # Give girder time to start
@@ -29,7 +36,11 @@ while True:
 
 print('Creating admin user')
 r = requests.post(api_url + '/user', params=params, headers=headers)
-r.raise_for_status()
+if r.status_code == 400:
+    print('Admin user already exists. Database was not purged.')
+    print('If that is OK:')
+    final_msg()
+    sys.exit()
 
 # Store token for future requests
 headers['Girder-Token'] = r.json()['authToken']['token']
@@ -189,8 +200,4 @@ print('Starting image build (this will take a while)...')
 r = requests.put(api_url + '/image/{_id}/build'.format(**image),
                  headers=headers)
 r.raise_for_status()
-
-print('-------------- You should be all set!! -------------')
-print('try going to https://girder.local.wholetale.org and log in with: ')
-print('  user : %s' % params['login'])
-print('  pass : %s' % params['password'])
+final_msg()
