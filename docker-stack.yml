@@ -69,12 +69,15 @@ services:
         - "traefik.enable=false"
 
   dashboard:
-    image: wholetale/dashboard:latest
+    image: wholetale/dashboardproxy:latest
+    # build: ./dashboard_local
     networks:
       - traefik-net
     environment:
       - GIRDER_API_URL=https://girder.local.wholetale.org
       - AUTH_PROVIDER=Globus
+    volumes:
+      - ./src/dashboard/dist:/srv/dashboard
     deploy:
       replicas: 1
       labels:

@@ -1,4 +1,6 @@
-.PHONY: clean dirs dev images
+.PHONY: clean dirs dev images gwvolman_src wholetale_src dms_src home_src dashboard_src sources \
+	rebuild_dashboard restart_worker
+
 SUBDIRS = ps homes src
 TAG = latest
 
@@ -7,24 +9,36 @@ images:
 	docker pull mongo:3.2
 	docker pull redis:latest
 	docker pull registry:2.6
+	docker pull risingstack/alpine:3.7-v8.10.0-4.8.0
 	docker pull wholetale/girder:$(TAG)
-	docker pull wholetale/dashboard:$(TAG)
 	docker pull wholetale/gwvolman:$(TAG)
 
-sources:
+src/gwvolman:
 	git clone https://github.com/whole-tale/gwvolman src/gwvolman
+
+src/wholetale:
 	git clone https://github.com/whole-tale/girder_wholetale src/wholetale
+
+src/wt_data_manager:
 	git clone https://github.com/whole-tale/girder_wt_data_manager src/wt_data_manager
+
+src/wt_home_dir:
 	git clone https://github.com/whole-tale/wt_home_dirs src/wt_home_dir
+
+src/dashboard:
+	git clone https://github.com/whole-tale/dashboard src/dashboard
+	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app risingstack/alpine:3.7-v8.10.0-4.8.0 sh -c "$$(cat dashboard_local/initial_build.sh)"
+
+sources: src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard
 
 dirs: $(SUBDIRS)
 
 $(SUBDIRS):
 	@mkdir $@
 
-services: dirs sources images
+services: dirs sources
 
-dev:
+dev: services
 	docker stack deploy --compose-file=docker-stack.yml wt
 	./run_worker.sh
 	cid=$$(docker ps --filter=name=wt_girder -q);
@@ -37,6 +51,12 @@ dev:
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -e /gwvolman
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir
 	./setup_girder.py
+
+rebuild_dashboard: src/dashboard
+	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app risingstack/alpine:3.7-v8.10.0-4.8.0 ./node_modules/.bin/ember build --environment=production
+
+restart_worker:
+	./stop_worker.sh && ./run_worker.sh
 
 clean:
 	-./stop_worker.sh
