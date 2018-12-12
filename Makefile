@@ -1,14 +1,15 @@
 .PHONY: clean dirs dev images
 SUBDIRS = ps homes src
+TAG = latest
 
 images:
 	docker pull traefik:alpine
 	docker pull mongo:3.2
 	docker pull redis:latest
 	docker pull registry:2.6
-	docker pull wholetale/girder:latest
-	docker pull wholetale/dashboard:latest
-	docker pull wholetale/gwvolman:latest
+	docker pull wholetale/girder:$(TAG)
+	docker pull wholetale/dashboard:$(TAG)
+	docker pull wholetale/gwvolman:$(TAG)
 
 sources:
 	git clone https://github.com/whole-tale/gwvolman src/gwvolman
