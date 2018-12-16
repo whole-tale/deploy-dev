@@ -23,5 +23,5 @@ dev: dirs images
 clean:
 	-./stop_worker.sh
 	-docker stack rm wt
-	-docker volume rm wt_mongo-cfg wt_mongo-data
+	./remove_mongo_volumes.sh
 
