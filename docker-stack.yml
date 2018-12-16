@@ -5,6 +5,7 @@ services:
     image: traefik:alpine
     ports:
       - "80:80"
+      - "443:443"
       - "8080:8080"
     networks:
       - traefik-net
@@ -26,7 +27,9 @@ services:
 
 
   girder:
-    image: wholetale/girder:latest
+    #image: wholetale/girder:latest
+    image: hategan/wt-girder-globus:latest
+
     networks:
       - celery
       - traefik-net
@@ -37,16 +40,16 @@ services:
       - ./ps:/tmp/ps
       - ./girder/girder.local.cfg:/girder/girder/conf/girder.local.cfg
     environment:
-      - DOMAIN=vcap.me
+      - DOMAIN=local.wholetale.org
     deploy:
       replicas: 1
       labels:
-        - "traefik.frontend.rule=Host:girder.vcap.me"
+        - "traefik.frontend.rule=Host:girder.local.wholetale.org"
         - "traefik.port=8080"
         - "traefik.enable=true"
         - "traefik.docker.network=wt_traefik-net"
         - "traefik.frontend.passHostHeader=true"
-        - "traefik.frontend.entryPoints=http"
+        - "traefik.frontend.entryPoints=https"
 
   redis:
     image: redis
@@ -62,22 +65,22 @@ services:
     networks:
       - traefik-net
     environment:
-      - GIRDER_API_URL=http://girder.vcap.me
-      - AUTH_PROVIDER=GitHub
+      - GIRDER_API_URL=https://girder.local.wholetale.org
+      - AUTH_PROVIDER=Globus
     deploy:
       replicas: 1
       labels:
         - "traefik.port=80"
-        - "traefik.frontend.rule=Host:dashboard.vcap.me"
+        - "traefik.frontend.rule=Host:dashboard.local.wholetale.org"
         - "traefik.enable=true"
         - "traefik.docker.network=wt_traefik-net"
         - "traefik.frontend.passHostHeader=true"
-        - "traefik.frontend.entryPoints=http"
+        - "traefik.frontend.entryPoints=https"
 
   registry:
     image: registry:2.6
     ports:
-      - 443:443
+      - 444:444
     networks:
       - celery
     volumes:
@@ -88,7 +91,7 @@ services:
       - REGISTRY_AUTH=htpasswd
       - REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm"
       - REGISTRY_AUTH_HTPASSWD_PATH=/auth/registry.password
-      - REGISTRY_HTTP_ADDR=0.0.0.0:443
+      - REGISTRY_HTTP_ADDR=0.0.0.0:444
       - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/dev.crt
       - REGISTRY_HTTP_TLS_KEY=/certs/dev.key
     deploy:

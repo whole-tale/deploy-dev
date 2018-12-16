@@ -1,6 +1,6 @@
 #!/bin/sh
 
-domain=vcap.me
+domain=local.wholetale.org
 role=manager,celery
 image=wholetale/gwvolman:latest
 registry_user=fido
@@ -16,7 +16,7 @@ docker run \
     --name celery_worker \
     --label traefik.enable=false \
     -e HOSTDIR=/host \
-    -e DOMAIN=vcap.me \
+    -e DOMAIN=local.wholetale.org \
     -e TRAEFIK_NETWORK=wt_traefik-net \
     -e TRAEFIK_ENTRYPOINT=http \
     -e REGISTRY_USER=${registry_user} \

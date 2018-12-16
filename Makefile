@@ -16,6 +16,7 @@ $(SUBDIRS):
 	@mkdir $@
 
 dev: dirs images
+	./check_certs.sh
 	docker stack deploy --compose-file=docker-stack.yml wt
 	./run_worker.sh
 	./setup_girder.py

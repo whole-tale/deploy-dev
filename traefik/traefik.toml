@@ -10,18 +10,27 @@ logLevel = "INFO"
 #
 # InsecureSkipVerify = true
 
-defaultEntryPoints = ["http"]
+defaultEntryPoints = ["https"]
+#defaultEntryPoints = ["http"]
 
 [entryPoints]
   [entryPoints.http]
   address = ":80"
+#    [entryPoints.http.redirect]
+#    entryPoint = "https"
+  [entryPoints.https]
+  address = ":443"
+    [entryPoints.https.tls]
+      [[entryPoints.https.tls.certificates]]
+      certFile = "/etc/traefik/certs/ssl.crt"
+      keyFile = "/etc/traefik/certs/ssl.key"
 
 [web]
 address = ":8080"
 
 [docker]
 endpoint = "unix:///var/run/docker.sock"
-domain = "vcap.me"
+domain = "local.wholetale.org"
 watch = true
 exposedbydefault = true
 swarmmode = true
