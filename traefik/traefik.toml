@@ -1,7 +1,11 @@
 graceTimeOut = "10s"
-debug = false
+debug = true
 checkNewVersion = false
-logLevel = "INFO"
+logLevel = "DEBUG"
+
+[traefikLog]
+filePath = "/etc/traefik/traefik.log"
+format = "common"
 
 # If set to true invalid SSL certificates are accepted for backends.
 # Note: This disables detection of man-in-the-middle attacks so should only be used on secure backend networks.
