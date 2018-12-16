@@ -1,5 +1,9 @@
 .PHONY: clean dirs dev images
 SUBDIRS = ps homes
+HOST_UID := $(shell id -u)
+HOST_GID := $(shell id -g)
+export HOST_UID
+export HOST_GID
 
 images:
 	docker pull traefik:alpine

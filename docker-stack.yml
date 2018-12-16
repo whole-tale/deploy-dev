@@ -41,6 +41,8 @@ services:
       - ./girder/girder.local.cfg:/girder/girder/conf/girder.local.cfg
     environment:
       - DOMAIN=local.wholetale.org
+      - HOST_UID=${HOST_UID}
+      - HOST_GID=${HOST_GID}
     deploy:
       replicas: 1
       labels:
