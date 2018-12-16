@@ -20,15 +20,22 @@ headers = {
 api_url = 'https://girder.local.wholetale.org/api/v1'
 
 # Give girder time to start
+connErrCount = 0
 while True:
     print('Waiting for Girder to start')
-    r = requests.get(api_url)
-    if r.status_code == 200:
-        break
+    try:
+        r = requests.get(api_url)
+        if r.status_code == 200:
+            break
+    except requests.exceptions.ConnectionError:
+        connErrCount = connErrCount + 1
+        if connErrCount > 10:
+            raise Exception('Could not connect to Girder')
     time.sleep(2)
 
 print('Creating admin user')
 r = requests.post(api_url + '/user', params=params, headers=headers)
+print('Response text: %s' % r.text)
 r.raise_for_status()
 
 # Store token for future requests
@@ -61,6 +68,12 @@ while True:
     time.sleep(2)
 
 print('Setting up Plugin')
+
+def getAndCheckEnv(name):
+    val = os.environ.get(name)
+    if val == "" or val == None:
+        raise Exception(name + " is not set")
+    return val
 
 settings = [
     {
