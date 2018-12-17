@@ -102,7 +102,10 @@ settings = [
         'value': os.environ.get('GLOBUS_CLIENT_SECRET')
     }, {
         'key': 'oauth.providers_enabled',
-        'value': ['Globus']
+        'value': ['globus']
+    }, {
+        'key': 'dm.globus_gc_dir',
+        'value': '/opt/globusconnectpersonal'
     }
 ]
 
