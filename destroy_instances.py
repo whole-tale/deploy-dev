@@ -13,7 +13,11 @@ headers = {
 
 api_url = 'https://girder.local.wholetale.org/api/v1'
 
-r = requests.get(api_url + '/user/authentication', auth=HTTPBasicAuth('admin', 'arglebargle123'))
+try:
+    r = requests.get(api_url + '/user/authentication', auth=HTTPBasicAuth('admin', 'arglebargle123'))
+except:
+    print('Girder is no longer running')
+    exit()
 r.raise_for_status()
 headers['Girder-Token'] = r.json()['authToken']['token']
 
