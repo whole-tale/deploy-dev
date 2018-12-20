@@ -16,7 +16,8 @@ docker run \
     --name celery_worker \
     --label traefik.enable=false \
     -e HOSTDIR=/host \
-    -e DOMAIN=local.wholetale.org \
+    -e DOMAIN=${domain} \
+    -e GIRDER_API_URL=https://girder.${domain} \
     -e TRAEFIK_NETWORK=wt_traefik-net \
     -e TRAEFIK_ENTRYPOINT=https \
     -e REGISTRY_USER=${registry_user} \
