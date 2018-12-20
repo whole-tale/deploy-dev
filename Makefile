@@ -53,6 +53,7 @@ dev: services
 	./setup_girder.py
 
 rebuild_dashboard: src/dashboard
+	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app risingstack/alpine:3.7-v8.10.0-4.8.0 npm install
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app risingstack/alpine:3.7-v8.10.0-4.8.0 ./node_modules/.bin/ember build --environment=production
 
 restart_worker:
@@ -62,4 +63,14 @@ clean:
 	-./stop_worker.sh
 	-./destroy_instances.py
 	-docker stack rm wt
+	limit=15 ; \
+	until [ -z "$$(docker service ls --filter label=com.docker.stack.namespace=wt -q)" ] || [ "$${limit}" -lt 0 ]; do \
+	  sleep 2 ; \
+	  limit="$$((limit-1))" ; \
+	done; true
+	limit=15 ; \
+	until [ -z "$$(docker network ls --filter label=com.docker.stack.namespace=wt -q)" ] || [ "$${limit}" -lt 0 ]; do \
+	  sleep 2 ; \
+	  limit="$$((limit-1))" ; \
+	done; true
 	-docker volume rm wt_mongo-cfg wt_mongo-data
