@@ -5,6 +5,7 @@ import time
 import os
 import sys
 from requests.auth import HTTPBasicAuth
+from subprocess import check_output
 
 headers = {
     'Content-Type': 'application/json',
@@ -27,3 +28,6 @@ r = requests.get(api_url + '/instance', headers=headers,
 r.raise_for_status()
 for instance in r.json():
     requests.delete(api_url + '/instance/' + instance['_id'], headers=headers)
+
+cmd = "docker service ls --filter=name=tmp -q | xargs -r docker service rm"
+print(check_output(cmd, shell=True))
