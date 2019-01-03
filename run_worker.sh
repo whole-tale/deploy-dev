@@ -11,13 +11,14 @@ docker stop -t 0 celery_worker >/dev/null 2>&1
 docker rm celery_worker > /dev/null 2>&1
 
 # docker pull ${image} > /dev/null 2>&1
+# Do not set GIRDER_API_URL for celery_worker it's handled elsewhere for local deployment
+# See my comment: https://github.com/whole-tale/deploy-dev/issues/10#issuecomment-451193663
 
 docker run \
     --name celery_worker \
     --label traefik.enable=false \
     -e HOSTDIR=/host \
     -e DOMAIN=${domain} \
-    -e GIRDER_API_URL=https://girder.${domain} \
     -e TRAEFIK_NETWORK=wt_traefik-net \
     -e TRAEFIK_ENTRYPOINT=https \
     -e REGISTRY_USER=${registry_user} \
