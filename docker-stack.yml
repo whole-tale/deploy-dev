@@ -76,6 +76,7 @@ services:
     environment:
       - GIRDER_API_URL=https://girder.local.wholetale.org
       - AUTH_PROVIDER=Globus
+      - DATAONE_URL=https://cn-stage-2.test.dataone.org
     volumes:
       - ./src/dashboard/dist:/srv/dashboard
     deploy:
