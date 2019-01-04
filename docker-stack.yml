@@ -38,7 +38,6 @@ services:
       - ./girder/girder.local.cfg:/girder/girder/conf/girder.local.cfg
     environment:
       - DOMAIN=vcap.me
-      - DATAONE_CN=https://cn.dataone.org/cn
     deploy:
       replicas: 1
       labels:
@@ -65,6 +64,7 @@ services:
     environment:
       - GIRDER_API_URL=http://girder.vcap.me
       - AUTH_PROVIDER=GitHub
+      - DATAONE_URL=https://cn.dataone.org
     deploy:
       replicas: 1
       labels:
