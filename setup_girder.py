@@ -182,7 +182,7 @@ i_params = {
                         'PASSWORD=djkslajdklasjdklsajd'],
         'memLimit': '2048m',
         'port': 8787,
-        'targetMount': '/home/rstudio/work',
+        'targetMount': '/WholeTale',
         'urlPath': '',
         'user': 'rstudio'
     }),
