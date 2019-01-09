@@ -52,6 +52,17 @@ dev: services
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir
 	./setup_girder.py
 
+restart_girder:
+	docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
+		curl -XPUT -s 'http://localhost:8080/api/v1/system/restart' \
+			--header 'Content-Type: application/json' \
+			--header 'Accept: application/json' \
+			--header 'Content-Length: 0' \
+			--header "Girder-Token: $$(docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
+				curl 'http://localhost:8080/api/v1/user/authentication' \
+				--basic --user admin:arglebargle123 \
+					| jq -r .authToken.token)"
+	
 rebuild_dashboard: src/dashboard
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app risingstack/alpine:3.7-v8.10.0-4.8.0 npm install
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app risingstack/alpine:3.7-v8.10.0-4.8.0 ./node_modules/.bin/ember build --environment=production
