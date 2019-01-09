@@ -163,7 +163,7 @@ r.raise_for_status()
 
 print('Create an RStudio recipe')
 r_params = {
-    'commitId': '1728ada20a6738fdc75291fc2173d34352faa0a9',
+    'commitId': '6db981ba28114e8c512c656c19309512614004f5',
     'description': 'RStudio with iframe support (env)',
     'name': 'rocker_rstudio',
     'public': True,
