@@ -1,5 +1,5 @@
 .PHONY: clean dirs dev images gwvolman_src wholetale_src dms_src home_src dashboard_src sources \
-	rebuild_dashboard restart_worker
+	rebuild_dashboard restart_worker restart_girder
 
 SUBDIRS = ps homes src
 TAG = latest
@@ -52,7 +52,8 @@ dev: services
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir
 	./setup_girder.py
 
-restart_girder:
+restart_girder: dev
+	which jq || echo "Please install jq to execute the 'restart_girder' make target" && exit 1
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
 		curl -XPUT -s 'http://localhost:8080/api/v1/system/restart' \
 			--header 'Content-Type: application/json' \
