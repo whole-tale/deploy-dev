@@ -1,5 +1,5 @@
 .PHONY: clean dirs dev images gwvolman_src wholetale_src dms_src home_src dashboard_src sources \
-	rebuild_dashboard restart_worker restart_girder
+	rebuild_dashboard restart_worker restart_girder globus_handler_src
 
 SUBDIRS = ps homes src
 TAG = latest
@@ -29,7 +29,10 @@ src/dashboard:
 	git clone https://github.com/whole-tale/dashboard src/dashboard
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app risingstack/alpine:3.7-v8.10.0-4.8.0 sh -c "$$(cat dashboard_local/initial_build.sh)"
 
-sources: src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard
+src/globus_handler_src:
+	git clone https://github.com/whole-tale/globus_handler src/globus_handler
+
+sources: src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard src/globus_handler
 
 dirs: $(SUBDIRS)
 
@@ -49,7 +52,7 @@ dev: services
 	done; \
 	true
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -e /gwvolman
-	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir
+	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir,globus_handler
 	./setup_girder.py
 
 restart_girder: dev

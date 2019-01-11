@@ -44,6 +44,7 @@ services:
       - ./src/wholetale:/girder/plugins/wholetale
       - ./src/wt_data_manager:/girder/plugins/wt_data_manager
       - ./src/wt_home_dir:/girder/plugins/wt_home_dir
+      - ./src/globus_handler:/girder/plugins/globus_handler
       - ./src/gwvolman:/gwvolman
     environment:
       - DOMAIN=local.wholetale.org
