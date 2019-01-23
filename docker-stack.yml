@@ -50,6 +50,7 @@ services:
       - DOMAIN=local.wholetale.org
       - GOSU_USER=girder:girder
       - "GOSU_CHOWN=/tmp/wt-home-dirs /tmp/wt-tale-dirs /tmp/ps"
+      - DATAONE_URL=https://cn-stage-2.test.dataone.org/cn
     deploy:
       replicas: 1
       labels:
