@@ -64,7 +64,7 @@ services:
     environment:
       - GIRDER_API_URL=http://girder.vcap.me
       - AUTH_PROVIDER=GitHub
-      - DATAONE_URL=https://cn.dataone.org
+      - DATAONE_URL=https://cn.dataone.org/cn
     deploy:
       replicas: 1
       labels:
