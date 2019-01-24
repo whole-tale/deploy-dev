@@ -10,7 +10,7 @@ sudo umount /usr/local/lib > /dev/null 2>&1 || true
 docker stop -t 0 celery_worker >/dev/null 2>&1
 docker rm celery_worker > /dev/null 2>&1
 
-# docker pull ${image} > /dev/null 2>&1
+docker pull ${image} > /dev/null 2>&1
 # Do not set GIRDER_API_URL for celery_worker it's handled elsewhere for local deployment
 # See my comment: https://github.com/whole-tale/deploy-dev/issues/10#issuecomment-451193663
 
