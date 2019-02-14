@@ -33,8 +33,8 @@ services:
   girder:
     image: wholetale/girder:latest
     networks:
-      - celery
       - traefik-net
+      - celery
       - mongo
     volumes:
       - ./homes:/tmp/wt-home-dirs
@@ -48,6 +48,7 @@ services:
       - ./src/gwvolman:/gwvolman
     environment:
       - DOMAIN=local.wholetale.org
+      - DASHBOARD_URL=https://dashboard.local.wholetale.org
       - GOSU_USER=girder:girder
       - "GOSU_CHOWN=/tmp/wt-home-dirs /tmp/wt-tale-dirs /tmp/ps"
     deploy:
