@@ -139,7 +139,7 @@ dataSet = [
     {
         'itemId': obj['_id'],
         '_modelType': obj['_modelType'],
-        'mountPath': '/' + obj['name'],
+        'mountPath': obj['name'],
     }
     for obj in r.json()
 ]
