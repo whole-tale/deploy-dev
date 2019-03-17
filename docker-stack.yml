@@ -80,6 +80,7 @@ services:
       - GIRDER_API_URL=https://girder.local.wholetale.org
       - AUTH_PROVIDER=Globus
       - DATAONE_URL=https://cn-stage-2.test.dataone.org
+      - DASHBOARD_DEV=true
     volumes:
       - ./src/dashboard/dist:/srv/dashboard
     deploy:
