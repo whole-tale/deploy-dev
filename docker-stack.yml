@@ -62,7 +62,7 @@ services:
         - "traefik.frontend.passHostHeader=true"
         - "traefik.frontend.entryPoints=https"
 
-  redis:
+  redis:4-stretch
     image: redis
     networks:
       - celery

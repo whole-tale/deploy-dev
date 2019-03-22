@@ -29,7 +29,7 @@ src/dashboard:
 	git clone https://github.com/whole-tale/dashboard src/dashboard
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app risingstack/alpine:3.7-v8.10.0-4.8.0 sh -c "$$(cat dashboard_local/initial_build.sh)"
 
-src/globus_handler_src:
+src/globus_handler:
 	git clone https://github.com/whole-tale/globus_handler src/globus_handler
 
 sources: src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard src/globus_handler
