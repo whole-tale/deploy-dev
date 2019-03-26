@@ -68,6 +68,10 @@ restart_girder: dev
 					| jq -r .authToken.token)"
 	
 rebuild_dashboard: src/dashboard
+	sed -e "s|apiHOST|https://girder.local.wholetale.org|g" \
+		-e "s|dashboardHOST|https://dashboard.local.wholetale.org|g" \
+		-e "s|dataOneHOST|https://cn-stage-2.test.dataone.org|g" \
+		-e "s|authPROVIDER|Globus|g" -i src/dashboard/config/environment.js
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app risingstack/alpine:3.7-v8.10.0-4.8.0 npm install
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app risingstack/alpine:3.7-v8.10.0-4.8.0 ./node_modules/.bin/ember build --environment=production
 
