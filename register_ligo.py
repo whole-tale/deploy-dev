@@ -135,16 +135,10 @@ r = requests.post(
 )
 
 r = requests.get(
-    api_url + '/dataset',
-    params={'identifiers': json.dumps(ligo_data)},
-    headers=headers,
+    api_url + '/dataset', params={'identifiers': json.dumps(ligo_data)}, headers=headers
 )
 dataSet = [
-    {
-        'itemId': obj['_id'],
-        '_modelType': obj['_modelType'],
-        'mountPath': obj['name'],
-    }
+    {'itemId': obj['_id'], '_modelType': obj['_modelType'], 'mountPath': obj['name']}
     for obj in r.json()
 ]
 
@@ -152,7 +146,13 @@ r = requests.get(api_url + '/image', params={'text': 'Jupyter'}, headers=headers
 imageId = r.json()[0]['_id']
 
 tale = {
-    "authors": "Kacper Kowalik",
+    "authors": [
+        {
+            "firstName": "Kacper",
+            "lastName": "Kowalik",
+            "orcid": "https://orcid.org/0000-0003-1709-3744",
+        }
+    ],
     "category": "astronomy",
     "config": {},
     "dataSet": dataSet,
