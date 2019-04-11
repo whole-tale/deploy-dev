@@ -9,7 +9,7 @@ images:
 	docker pull mongo:3.2
 	docker pull redis:latest
 	docker pull registry:2.6
-	docker pull risingstack/alpine:3.7-v8.10.0-4.8.0
+	docker pull node:carbon-slim
 	docker pull wholetale/girder:$(TAG)
 	docker pull wholetale/gwvolman:$(TAG)
 
@@ -27,7 +27,7 @@ src/wt_home_dir:
 
 src/dashboard:
 	git clone https://github.com/whole-tale/dashboard src/dashboard
-	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app risingstack/alpine:3.7-v8.10.0-4.8.0 sh -c "$$(cat dashboard_local/initial_build.sh)"
+	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c "$$(cat dashboard_local/initial_build.sh)"
 
 src/globus_handler:
 	git clone https://github.com/whole-tale/globus_handler src/globus_handler
@@ -72,7 +72,6 @@ rebuild_dashboard: src/dashboard
 		-e "s|dashboardHOST|https://dashboard.local.wholetale.org|g" \
 		-e "s|dataOneHOST|https://cn-stage-2.test.dataone.org|g" \
 		-e "s|authPROVIDER|Globus|g" -i src/dashboard/config/environment.js
-	# Previous image: risingstack/alpine:3.7-v8.10.0-4.8.0
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c 'NODE_ENV=development npm install && ./node_modules/.bin/ember build --environment=production'
 
 watch_dashboard: src/dashboard
@@ -80,7 +79,6 @@ watch_dashboard: src/dashboard
                 -e "s|dashboardHOST|https://dashboard.local.wholetale.org|g" \
                 -e "s|dataOneHOST|https://cn-stage-2.test.dataone.org|g" \
                 -e "s|authPROVIDER|Globus|g" -i src/dashboard/config/environment.js
-	# Previous image: risingstack/alpine:3.7-v8.10.0-4.8.0
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c 'NODE_ENV=development npm install && ./node_modules/.bin/ember serve --environment=production'
 
 restart_worker:
