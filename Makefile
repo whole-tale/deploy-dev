@@ -55,8 +55,8 @@ dev: services
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir,globus_handler
 	./setup_girder.py
 
-restart_girder: dev
-	which jq || echo "Please install jq to execute the 'restart_girder' make target" && exit 1
+restart_girder: 
+	which jq || (echo "Please install jq to execute the 'restart_girder' make target" && exit 1)
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
 		curl -XPUT -s 'http://localhost:8080/api/v1/system/restart' \
 			--header 'Content-Type: application/json' \
