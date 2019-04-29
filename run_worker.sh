@@ -1,6 +1,6 @@
 #!/bin/sh
 
-domain=vcap.me
+domain=local.wholetale.org
 role=manager,celery
 image=wholetale/gwvolman:latest
 registry_user=fido
@@ -11,14 +11,16 @@ docker stop -t 0 celery_worker >/dev/null 2>&1
 docker rm celery_worker > /dev/null 2>&1
 
 # docker pull ${image} > /dev/null 2>&1
+# Do not set GIRDER_API_URL for celery_worker it's handled elsewhere for local deployment
+# See my comment: https://github.com/whole-tale/deploy-dev/issues/10#issuecomment-451193663
 
 docker run \
     --name celery_worker \
     --label traefik.enable=false \
     -e HOSTDIR=/host \
-    -e DOMAIN=vcap.me \
+    -e DOMAIN=${domain} \
     -e TRAEFIK_NETWORK=wt_traefik-net \
-    -e TRAEFIK_ENTRYPOINT=http \
+    -e TRAEFIK_ENTRYPOINT=https \
     -e REGISTRY_USER=${registry_user} \
     -e REGISTRY_URL=https://registry.${domain} \
     -e REGISTRY_PASS=${registry_pass} \
@@ -26,6 +28,7 @@ docker run \
     -v /:/host \
     -v /var/cache/davfs2:/var/cache/davfs2 \
     -v /run/mount.davfs:/run/mount.davfs \
+    -v $PWD/src/gwvolman:/gwvolman \
     --device /dev/fuse \
     --cap-add SYS_ADMIN \
     --cap-add SYS_PTRACE \

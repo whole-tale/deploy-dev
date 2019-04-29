@@ -1,7 +1,7 @@
 Setting up a local instance of Whole Tale
 =========================================
 
-This directory contains scripts required to run a full instance of the Whole Tale platform  on a single system (e.g., laptop or VM). The installation uses a predefined domain `*.vcap.me` which maps to localhost. This means that VM-based installations will require port forwarding to access (see below).
+This directory contains scripts required to run a full instance of the Whole Tale platform  on a single system (e.g., laptop or VM). The installation uses a predefined domain `*.local.wholetale.org` which maps to localhost. This means that VM-based installations will require port forwarding to access (see below).
 
 
 System requirements
@@ -10,7 +10,8 @@ System requirements
  * docker 17.04.0+, swarm mode
  * python, requests
  * make (optional)
- * [GitHub OAuth App](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/) credentials with callback set to `http://girder.vcap.me/api/v1/oauth/github/callback`.
+ * Globus OAuth credentials (pinned at `#core-dev`)
+ * SSL certs for .local.wholetale.org (pinned at `#core-dev`)
  * Default user with uid:1000 and gid:100
   
  
@@ -37,16 +38,28 @@ Add default user (1000) and group (100), if not present:
 [[ -z $(getent passwd 1000) ]] && sudo useradd -g 100 -u 1000 wtuser
 ```
 
-Export your Github Oauth ID and secret:
+Export Globus Oauth ID and secret (available on `#core-dev`):
 ```
-export GITHUB_CLIENT_ID=<client ID>
-export GITHUB_CLIENT_SECRET=<client secret>
+export GLOBUS_CLIENT_ID=<client ID>
+export GLOBUS_CLIENT_SECRET=<client secret>
 ```
 
 Clone this repository and  run `make dev`:
+
 ```
-git clone https://github.com/whole-tale/deploy-dev
+git clone https://github.com/whole-tale/deploy-dev -b dev
 cd deploy-dev/
+```
+
+Download SSL certs from `#core-dev` and extract them:
+
+```
+tar xvf acme.tar
+```
+
+Run:
+```
+make services
 make dev
 ```
 
@@ -68,15 +81,12 @@ $ docker ps | grep celery_worker
 0e8124024f03        wholetale/gwvolman:latest                                "python3 -m girder_w…"   15 hours ago        Up 15 hours                             celery_worker
 ```
 
-Note: If you're running in a VM, you'll need to setup  forwarding for port 80 (requires `sudo`):
+Note: If you're running in a VM, you'll need to setup  forwarding for port 443 (requires `sudo`):
 ```
-$ sudo ssh -L 80:localhost:80 user@VM
+$ sudo ssh -L 443:localhost:443 user@VM
 ```
 
-
-You should now be able to open a browser to http://dashboard.vcap.me to access your running instance of Whole Tale.  
-
-
+You should now be able to open a browser to https://dashboard.local.wholetale.org to access your running instance of Whole Tale.
 
 Uninstall
 ---------

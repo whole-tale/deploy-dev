@@ -1,0 +1,6 @@
+src/*
+registry/docker
+traefik/access.log
+traefik/acme
+homes/*
+ps/*
