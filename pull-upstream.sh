@@ -1,7 +1,8 @@
 #!/bin/bash
 #
-# By deafult, this script will pull from upstream master in all watched subdirectories.
-# The user may optionally pass a subset of watched subdirectories from which to pull.
+# By default, this script will pull from upstream master in all watched subdirectories.
+# The user may optionally pass a comma-separated subset of watched subdirectories from 
+# which to pull.
 #
 # Usage: ./pull-upstream.sh [subdirectory1,subdirectory2,subdirectory3,...]
 # 
@@ -22,10 +23,8 @@ else
 	subdirs="$1"
 fi
 
-# Loop over all subdirectories and pull from upstream
+# Loop over supplied subdirectories and pull from upstream
 for subdir in $(echo "$subdirs" | sed "s/,/ /g")
 do
-	$DEBUG cd $root_dir/src/$subdir || exit 1
-	$DEBUG git pull origin master || exit 1
-	$DEBUG cd $root_dir || exit 1
+	($DEBUG cd $root_dir/src/$subdir && $DEBUG git pull origin master) || exit 1
 done
