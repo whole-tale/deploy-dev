@@ -72,6 +72,7 @@ rebuild_dashboard: src/dashboard
 	sed -e "s|apiHOST|https://girder.local.wholetale.org|g" \
 		-e "s|dashboardHOST|https://dashboard.local.wholetale.org|g" \
 		-e "s|dataOneHOST|https://cn-stage-2.test.dataone.org|g" \
+		-e "s|dashboardDev|true|g" \
 		-e "s|authPROVIDER|Globus|g" -i src/dashboard/config/environment.js
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c 'NODE_ENV=development npm install && ./node_modules/.bin/ember build --environment=production'
 
@@ -79,6 +80,7 @@ watch_dashboard: src/dashboard
 	sed -e "s|apiHOST|https://girder.local.wholetale.org|g" \
                 -e "s|dashboardHOST|https://dashboard.local.wholetale.org|g" \
                 -e "s|dataOneHOST|https://cn-stage-2.test.dataone.org|g" \
+		-e "s|dashboardDev|true|g" \
                 -e "s|authPROVIDER|Globus|g" -i src/dashboard/config/environment.js
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c 'NODE_ENV=development npm install && ./node_modules/.bin/ember serve --environment=production'
 
