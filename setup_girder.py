@@ -127,7 +127,6 @@ i_params = {
         'targetMount': '/home/jovyan/work',
         'urlPath': '?token={token}',
         'buildpack': 'PythonBuildPack',
-        'template': 'base.tpl',
         'user': 'jovyan'
     }),
     'icon': (
@@ -154,40 +153,13 @@ i_params = {
         'port': 8787,
         'targetMount': '/WholeTale',
         'urlPath': '',
-        'buildpack': 'RBuildPack',
-        'template': 'rocker-geospatial.tpl',
+        'buildpack': 'RockerBuildPack',
         'user': 'rstudio'
     }),
     'icon': 'https://www.rstudio.com/wp-content/uploads/'
             '2014/06/RStudio-Ball.png',
     'iframe': True,
     'name': 'RStudio (rocker/geospatial)',
-    'public': True
-}
-r = requests.post(api_url + '/image', headers=headers,
-                  params=i_params)
-r.raise_for_status()
-image = r.json()
-
-print('Create an RStudio image')
-i_params = {
-    'config': json.dumps({
-        'command': '/usr/lib/rstudio-server/bin/rserver',
-        'environment': ['CSP_HOSTS=dashboard.local.wholetale.org',
-                        'PASSWORD=djkslajdklasjdklsajd'],
-        'memLimit': '2048m',
-        'port': 8787,
-        'targetMount': '/WholeTale',
-        'urlPath': '',
-        'buildpack': 'RBuildPack',
-        'template': 'base.tpl',
-        'user': 'rstudio'
-    }),
-    'fullName': 'xarthisius/rstudio',
-    'icon': 'https://www.rstudio.com/wp-content/uploads/'
-            '2014/06/RStudio-Ball.png',
-    'iframe': True,
-    'name': 'RStudio',
     'public': True
 }
 r = requests.post(api_url + '/image', headers=headers,
@@ -209,7 +181,6 @@ i_params = {
         'targetMount': '/home/jovyan/work',
         'urlPath': 'lab?token={token}',
         'buildpack': 'PythonBuildPack',
-        'template': 'base.tpl',
         'user': 'jovyan'
     }),
     'fullName': 'xarthisius/jupyter',
@@ -233,24 +204,22 @@ i_params = {
         'port': 3333,
         'targetMount': '/wholetale',
         'urlPath': '',
-        'user': 'wtuser',
         'buildpack': 'OpenRefineBuildPack',
-        'template': 'openrefine.tpl'
+        'user': 'wtuser'
     }),
     'icon': (
         'https://raw.githubusercontent.com/whole-tale/openrefine/master/openrefine_logo.png'
     ),
     'iframe': True,
     'name': 'OpenRefine',
-    'public': True,
-    'template': 'openrefine.tpl'
+    'public': True
 }
 r = requests.post(api_url + '/image', headers=headers,
                   params=i_params)
 r.raise_for_status()
 image = r.json()
 
-print('Create Spark image')
+print('Create Jupyter Spark image')
 i_params = {
     'config': json.dumps({
         'command': (
@@ -264,7 +233,6 @@ i_params = {
         'targetMount': '/home/jovyan/work',
         'urlPath': 'lab?token={token}',
         'buildpack': 'SparkBuildPack',
-        'template': 'base.tpl',
         'user': 'jovyan'
     }),
     'icon': (
