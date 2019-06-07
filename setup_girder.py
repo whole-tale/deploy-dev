@@ -127,7 +127,6 @@ i_params = {
         'targetMount': '/home/jovyan/work',
         'urlPath': '?token={token}',
         'buildpack': 'PythonBuildPack',
-        'template': 'base.tpl',
         'user': 'jovyan'
     }),
     'icon': (
@@ -154,40 +153,13 @@ i_params = {
         'port': 8787,
         'targetMount': '/WholeTale',
         'urlPath': '',
-        'buildpack': 'RBuildPack',
-        'template': 'rocker-geospatial.tpl',
+        'buildpack': 'RockerBuildPack',
         'user': 'rstudio'
     }),
     'icon': 'https://www.rstudio.com/wp-content/uploads/'
             '2014/06/RStudio-Ball.png',
     'iframe': True,
     'name': 'RStudio (rocker/geospatial)',
-    'public': True
-}
-r = requests.post(api_url + '/image', headers=headers,
-                  params=i_params)
-r.raise_for_status()
-image = r.json()
-
-print('Create an RStudio image')
-i_params = {
-    'config': json.dumps({
-        'command': '/usr/lib/rstudio-server/bin/rserver',
-        'environment': ['CSP_HOSTS=dashboard.local.wholetale.org',
-                        'PASSWORD=djkslajdklasjdklsajd'],
-        'memLimit': '2048m',
-        'port': 8787,
-        'targetMount': '/WholeTale',
-        'urlPath': '',
-        'buildpack': 'RBuildPack',
-        'template': 'base.tpl',
-        'user': 'rstudio'
-    }),
-    'fullName': 'xarthisius/rstudio',
-    'icon': 'https://www.rstudio.com/wp-content/uploads/'
-            '2014/06/RStudio-Ball.png',
-    'iframe': True,
-    'name': 'RStudio',
     'public': True
 }
 r = requests.post(api_url + '/image', headers=headers,
@@ -209,7 +181,6 @@ i_params = {
         'targetMount': '/home/jovyan/work',
         'urlPath': 'lab?token={token}',
         'buildpack': 'PythonBuildPack',
-        'template': 'base.tpl',
         'user': 'jovyan'
     }),
     'fullName': 'xarthisius/jupyter',
@@ -219,6 +190,57 @@ i_params = {
     ),
     'iframe': True,
     'name': 'Jupyter Lab',
+    'public': True
+}
+r = requests.post(api_url + '/image', headers=headers,
+                  params=i_params)
+r.raise_for_status()
+image = r.json()
+
+print('Create OpenRefine image')
+i_params = {
+    'config': json.dumps({
+        'memLimit': '2048m',
+        'port': 3333,
+        'targetMount': '/wholetale',
+        'urlPath': '',
+        'buildpack': 'OpenRefineBuildPack',
+        'user': 'wtuser'
+    }),
+    'icon': (
+        'https://raw.githubusercontent.com/whole-tale/openrefine/master/openrefine_logo.png'
+    ),
+    'iframe': True,
+    'name': 'OpenRefine',
+    'public': True
+}
+r = requests.post(api_url + '/image', headers=headers,
+                  params=i_params)
+r.raise_for_status()
+image = r.json()
+
+print('Create Jupyter Spark image')
+i_params = {
+    'config': json.dumps({
+        'command': (
+            'jupyter notebook --no-browser --port {port} --ip=0.0.0.0 '
+            '--NotebookApp.token={token} --NotebookApp.base_url=/{base_path} '
+            '--NotebookApp.port_retries=0'
+        ),
+        'environment': ['CSP_HOSTS=dashboard.local.wholetale.org'],
+        'memLimit': '2048m',
+        'port': 8888,
+        'targetMount': '/home/jovyan/work',
+        'urlPath': 'lab?token={token}',
+        'buildpack': 'SparkBuildPack',
+        'user': 'jovyan'
+    }),
+    'icon': (
+        'https://raw.githubusercontent.com/whole-tale/jupyter-base/master/'
+        'squarelogo-greytext-orangebody-greymoons.png'
+    ),
+    'iframe': True,
+    'name': 'Jupyter with Spark',
     'public': True
 }
 r = requests.post(api_url + '/image', headers=headers,
