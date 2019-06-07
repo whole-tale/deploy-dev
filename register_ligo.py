@@ -2,6 +2,7 @@ import mimetypes
 import json
 import requests
 import os
+import glob
 from requests.auth import HTTPBasicAuth
 
 headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
@@ -198,7 +199,7 @@ r = requests.post(api_url + '/tale', headers=headers, json=tale)
 tale = r.json()
 
 params = {'folderId': tale['workspaceId']}
-for filepath in ('ligo_tale/LOSC_Event_tutorial.ipynb', 'ligo_tale/readligo.py'):
+for filepath in glob.glob('ligo_tale/*'):
     filename = os.path.basename(filepath)
     filepath = os.path.abspath(filepath)
     filesize = os.path.getsize(filepath)
