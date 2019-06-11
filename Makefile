@@ -12,6 +12,7 @@ images:
 	docker pull node:carbon-slim
 	docker pull wholetale/girder:$(TAG)
 	docker pull wholetale/gwvolman:$(TAG)
+	docker pull wholetale/repo2docker_wholetale:$(TAG)
 
 src/gwvolman:
 	git clone https://github.com/whole-tale/gwvolman src/gwvolman
@@ -86,6 +87,10 @@ watch_dashboard: src/dashboard
 
 restart_worker:
 	./stop_worker.sh && ./run_worker.sh
+
+tail_girder_err:
+	docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
+		tail -n 200 /home/girder/.girder/logs/error.log
 
 clean:
 	-./stop_worker.sh
