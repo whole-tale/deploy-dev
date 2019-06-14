@@ -33,6 +33,7 @@ docker run \
     --cap-add SYS_ADMIN \
     --cap-add SYS_PTRACE \
     --network wt_celery \
+    --privileged \
     -d ${image} \
       -Q ${role},$(docker info --format "{{.Swarm.NodeID}}") \
       --hostname=$(docker info --format "{{.Swarm.NodeID}}")
