@@ -32,6 +32,7 @@ docker run \
     --device /dev/fuse \
     --cap-add SYS_ADMIN \
     --cap-add SYS_PTRACE \
+    --security-opt apparmor:unconfined \
     --network wt_celery \
     -d ${image} \
       -Q ${role},$(docker info --format "{{.Swarm.NodeID}}") \
