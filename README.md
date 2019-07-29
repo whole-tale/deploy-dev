@@ -45,7 +45,7 @@ export GLOBUS_CLIENT_ID=<client ID>
 export GLOBUS_CLIENT_SECRET=<client secret>
 ```
 
-Clone this repository and  run `make dev`:
+Clone this repository:
 
 ```
 git clone https://github.com/whole-tale/deploy-dev
@@ -54,9 +54,9 @@ cd deploy-dev/
 
 Create the traefik acme directory. Download SSL certs from `#core-dev` and copy to  `acme.json` in this directory. Change permissions and ownership:
 ```
-mkdir traefik/acme/acme.json
+mkdir traefik/acme
 sudo chown root:root traefik/acme/acme.json
-sudo chown 0600 traefik/acme/acme.json
+sudo chmod 0600 traefik/acme/acme.json
 ```
 
 
