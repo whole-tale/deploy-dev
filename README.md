@@ -54,7 +54,7 @@ cd deploy-dev/
 
 Create the traefik acme directory. Download SSL certs from `#core-dev` and copy to  `acme.json` in this directory. Change permissions and ownership:
 ```
-mkdir traefik/acme/acme.json
+mkdir traefik/acme
 sudo chown root:root traefik/acme/acme.json
 sudo chmod 0600 traefik/acme/acme.json
 ```
