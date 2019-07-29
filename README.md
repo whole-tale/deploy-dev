@@ -56,7 +56,7 @@ Create the traefik acme directory. Download SSL certs from `#core-dev` and copy 
 ```
 mkdir traefik/acme/acme.json
 sudo chown root:root traefik/acme/acme.json
-sudo chown 0600 traefik/acme/acme.json
+sudo chmod 0600 traefik/acme/acme.json
 ```
 
 
