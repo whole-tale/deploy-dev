@@ -13,6 +13,7 @@ System requirements
  * Globus OAuth credentials (pinned at `#core-dev`)
  * SSL certs for .local.wholetale.org (pinned at `#core-dev`)
  * Default user with uid:1000 and gid:100
+ * On Ubuntu, `apt-get install davfs2 fuse libfuse-dev`
   
  
 Deployment process
@@ -47,15 +48,17 @@ export GLOBUS_CLIENT_SECRET=<client secret>
 Clone this repository and  run `make dev`:
 
 ```
-git clone https://github.com/whole-tale/deploy-dev -b dev
+git clone https://github.com/whole-tale/deploy-dev
 cd deploy-dev/
 ```
 
-Download SSL certs from `#core-dev` and extract them:
+Create the traefik acme directory. Download SSL certs from `#core-dev` and copy to  `acme.json` in this directory. Change permissions and ownership:
+```
+mkdir traefik/acme/acme.json
+sudo chown root:root traefik/acme/acme.json
+sudo chown 0600 traefik/acme/acme.json
+```
 
-```
-tar xvf acme.tar
-```
 
 Run:
 ```
