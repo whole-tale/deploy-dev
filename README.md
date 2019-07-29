@@ -45,7 +45,7 @@ export GLOBUS_CLIENT_ID=<client ID>
 export GLOBUS_CLIENT_SECRET=<client secret>
 ```
 
-Clone this repository and  run `make dev`:
+Clone this repository:
 
 ```
 git clone https://github.com/whole-tale/deploy-dev
