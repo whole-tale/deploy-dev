@@ -36,7 +36,8 @@ docker run \
     --network wt_celery \
     -d ${image} \
       -Q ${role},$(docker info --format "{{.Swarm.NodeID}}") \
-      --hostname=$(docker info --format "{{.Swarm.NodeID}}")
+      --hostname=$(docker info --format "{{.Swarm.NodeID}}") \
+      -c 3
 
 docker exec -ti celery_worker chown davfs2:davfs2 /host/run/mount.davfs
 docker exec -ti celery_worker chown davfs2:davfs2 /host/var/cache/davfs2
