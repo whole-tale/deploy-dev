@@ -5,6 +5,8 @@ role=manager,celery
 image=wholetale/gwvolman:latest
 registry_user=fido
 registry_pass=secretpass
+node_id=$(docker info --format "{{.Swarm.NodeID}}")
+celery_args="-Q ${role},${node_id} --hostname=${node_id} -c 3"
 
 sudo umount /usr/local/lib > /dev/null 2>&1 || true
 docker stop -t 0 celery_worker >/dev/null 2>&1
@@ -18,6 +20,7 @@ docker run \
     --name celery_worker \
     --label traefik.enable=false \
     -e HOSTDIR=/host \
+    -e DEV=true \
     -e DOMAIN=${domain} \
     -e TRAEFIK_NETWORK=wt_traefik-net \
     -e TRAEFIK_ENTRYPOINT=https \
@@ -29,15 +32,13 @@ docker run \
     -v /var/cache/davfs2:/var/cache/davfs2 \
     -v /run/mount.davfs:/run/mount.davfs \
     -v $PWD/src/gwvolman:/gwvolman \
+    -v $PWD/src/girderfs:/girderfs \
     --device /dev/fuse \
     --cap-add SYS_ADMIN \
     --cap-add SYS_PTRACE \
     --security-opt apparmor:unconfined \
     --network wt_celery \
-    -d ${image} \
-      -Q ${role},$(docker info --format "{{.Swarm.NodeID}}") \
-      --hostname=$(docker info --format "{{.Swarm.NodeID}}") \
-      -c 3
+    -d ${image} ${celery_args}
 
 docker exec -ti celery_worker chown davfs2:davfs2 /host/run/mount.davfs
 docker exec -ti celery_worker chown davfs2:davfs2 /host/var/cache/davfs2

@@ -14,6 +14,9 @@ images:
 	docker pull wholetale/gwvolman:$(TAG)
 	docker pull wholetale/repo2docker_wholetale:$(TAG)
 
+src/girderfs:
+	git clone https://github.com/whole-tale/girderfs src/girderfs
+
 src/gwvolman:
 	git clone https://github.com/whole-tale/gwvolman src/gwvolman
 
@@ -33,7 +36,7 @@ src/dashboard:
 src/globus_handler:
 	git clone https://github.com/whole-tale/globus_handler src/globus_handler
 
-sources: src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard src/globus_handler
+sources: src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard src/globus_handler src/girderfs
 
 dirs: $(SUBDIRS)
 
