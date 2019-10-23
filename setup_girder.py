@@ -120,7 +120,7 @@ settings = [
         "key": "oauth.orcid_client_secret",
         "value": os.environ.get("ORCID_CLIENT_SECRET"),
     },
-    {"key": "oauth.providers_enabled", "value": ["globus"]},
+    {"key": "oauth.providers_enabled", "value": ["globus", "orcid"]},
     {"key": "dm.globus_gc_dir", "value": "/opt/globusconnectpersonal"},
     {
         "key": "wholetale.dataverse_extra_hosts",
