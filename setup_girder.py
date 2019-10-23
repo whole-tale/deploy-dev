@@ -115,6 +115,11 @@ settings = [
         "key": "oauth.globus_client_secret",
         "value": os.environ.get("GLOBUS_CLIENT_SECRET"),
     },
+    {"key": "oauth.orcid_client_id", "value": os.environ.get("ORCID_CLIENT_ID")},
+    {
+        "key": "oauth.orcid_client_secret",
+        "value": os.environ.get("ORCID_CLIENT_SECRET"),
+    },
     {"key": "oauth.providers_enabled", "value": ["globus"]},
     {"key": "dm.globus_gc_dir", "value": "/opt/globusconnectpersonal"},
     {
