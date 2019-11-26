@@ -96,7 +96,7 @@ print("Setting up Plugin")
 settings = [
     {
         "key": "core.cors.allow_origin",
-        "value": "https://dashboard.local.wholetale.org,https://next.local.wholetale.org",
+        "value": "https://dashboard.local.wholetale.org,http://localhost:4200,https://next.local.wholetale.org",
     },
     {
         "key": "core.cors.allow_headers",
