@@ -93,6 +93,25 @@ services:
         - "traefik.frontend.passHostHeader=true"
         - "traefik.frontend.entryPoints=https"
 
+  dashboard_next:
+    image: bodom0015/ng-dashboard:wt
+    networks:
+      - traefik-net
+    environment:
+      - GIRDER_API_URL=https://girder.local.wholetale.org
+      - AUTH_PROVIDER=Globus
+      - DATAONE_URL=https://cn-stage-2.test.dataone.org
+      - DASHBOARD_DEV=true
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.port=80"
+        - "traefik.frontend.rule=Host:next.local.wholetale.org"
+        - "traefik.enable=true"
+        - "traefik.docker.network=wt_traefik-net"
+        - "traefik.frontend.passHostHeader=true"
+        - "traefik.frontend.entryPoints=https"
+
   registry:
     image: registry:2.6
     networks:
