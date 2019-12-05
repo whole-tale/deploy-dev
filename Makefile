@@ -1,5 +1,6 @@
 .PHONY: clean dirs dev images gwvolman_src wholetale_src dms_src home_src dashboard_src sources \
-	rebuild_dashboard watch_dashboard watch_dashboard_dev restart_worker restart_girder globus_handler_src
+	rebuild_dashboard rebuild_dashboard_next watch_dashboard watch_dashboard_dev watch_dashboard_next \
+	restart_worker restart_girder globus_handler_src
 
 SUBDIRS = ps homes src
 TAG = latest
@@ -102,6 +103,9 @@ watch_dashboard_dev: src/dashboard
                 -e "s|dataOneHOST|https://cn-stage-2.test.dataone.org|g" \
                 -e "s|authPROVIDER|Globus|g" -i src/dashboard/config/environment.js
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c 'NODE_ENV=development npm install && ./node_modules/.bin/ember serve'
+
+rebuild_dashboard_next:
+	docker run --rm --user=1000:1000 -ti -v $${PWD}/src/wt_ng_dashboard:/srv/app -w /srv/app bodom0015/ng '${YARN} install --network-timeout=360000 && ${NG} build --prod --deleteOutputPath=false --progress'
 
 watch_dashboard_next:
 	docker run --rm --user=1000:1000 -ti -v $${PWD}/src/wt_ng_dashboard:/srv/app -w /srv/app bodom0015/ng '${YARN} install --network-timeout=360000 && ${NG} build --prod --watch --poll 15000 --deleteOutputPath=false --progress'
