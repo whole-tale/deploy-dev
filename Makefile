@@ -3,6 +3,10 @@
 
 SUBDIRS = ps homes src
 TAG = latest
+MEM_LIMIT = 2048
+NODE = node --max_old_space_size=${MEM_LIMIT}
+NG = ${NODE} ./node_modules/@angular/cli/bin/ng
+YARN = ${NODE} /usr/local/bin/yarn
 
 images:
 	docker pull traefik:alpine
@@ -99,8 +103,8 @@ watch_dashboard_dev: src/dashboard
                 -e "s|authPROVIDER|Globus|g" -i src/dashboard/config/environment.js
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c 'NODE_ENV=development npm install && ./node_modules/.bin/ember serve'
 
-watch_dashboard_next: 
-	docker run --rm -tid -v $${PWD}/src/wt_ng_dashboard:/srv/app -w /srv/app bodom0015/ng
+watch_dashboard_next:
+	docker run --rm --user=1000:1000 -ti -v $${PWD}/src/wt_ng_dashboard:/srv/app -w /srv/app bodom0015/ng '${YARN} install --network-timeout=360000 && ${NG} build --prod --watch --poll 15000 --deleteOutputPath=false --progress'
 
 restart_worker:
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -e /gwvolman
