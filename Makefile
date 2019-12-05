@@ -1,5 +1,5 @@
 .PHONY: clean dirs dev images gwvolman_src wholetale_src dms_src home_src dashboard_src sources \
-	rebuild_dashboard watch_dashboard restart_worker restart_girder globus_handler_src
+	rebuild_dashboard watch_dashboard watch_dashboard_dev restart_worker restart_girder globus_handler_src
 
 SUBDIRS = ps homes src
 TAG = latest
@@ -36,7 +36,10 @@ src/dashboard:
 src/globus_handler:
 	git clone https://github.com/whole-tale/globus_handler src/globus_handler
 
-sources: src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard src/globus_handler src/girderfs
+src/dashboard_next:
+	git clone https://github.com/bodom0015/wt-ng-dash src/wt_ng_dashboard
+
+sources: src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard src/globus_handler src/girderfs src/dashboard_next
 
 dirs: $(SUBDIRS)
 
@@ -62,6 +65,7 @@ dev: services
 
 restart_girder: 
 	which jq || (echo "Please install jq to execute the 'restart_girder' make target" && exit 1)
+	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -r /gwvolman/requirements.txt -e /gwvolman
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
 		curl -XPUT -s 'http://localhost:8080/api/v1/system/restart' \
 			--header 'Content-Type: application/json' \
@@ -88,7 +92,18 @@ watch_dashboard: src/dashboard
                 -e "s|authPROVIDER|Globus|g" -i src/dashboard/config/environment.js
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c 'NODE_ENV=development npm install && ./node_modules/.bin/ember serve --environment=production'
 
+watch_dashboard_dev: src/dashboard
+	sed -e "s|apiHOST|https://girder.local.wholetale.org|g" \
+                -e "s|dashboardHOST|https://dashboard.local.wholetale.org|g" \
+                -e "s|dataOneHOST|https://cn-stage-2.test.dataone.org|g" \
+                -e "s|authPROVIDER|Globus|g" -i src/dashboard/config/environment.js
+	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c 'NODE_ENV=development npm install && ./node_modules/.bin/ember serve'
+
+watch_dashboard_next: 
+	docker run --rm -tid -v $${PWD}/src/wt_ng_dashboard:/srv/app -w /srv/app bodom0015/ng
+
 restart_worker:
+	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -e /gwvolman
 	./stop_worker.sh && ./run_worker.sh
 
 tail_girder_err:

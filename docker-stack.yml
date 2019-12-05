@@ -111,6 +111,9 @@ services:
         - "traefik.docker.network=wt_traefik-net"
         - "traefik.frontend.passHostHeader=true"
         - "traefik.frontend.entryPoints=https"
+# Uncomment after running "ng build --prod --watch" to enable local development
+#    volumes:
+#      - ./src/wt_ng_dashboard/dist/browser/:/usr/share/nginx/html/
 
   registry:
     image: registry:2.6
