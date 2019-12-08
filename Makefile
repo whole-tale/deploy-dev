@@ -60,17 +60,19 @@ dev: services
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir,globus_handler
 	./setup_girder.py
 
-restart_girder: 
+restart_girder:
 	which jq || (echo "Please install jq to execute the 'restart_girder' make target" && exit 1)
-	docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
-		curl -XPUT -s 'http://localhost:8080/api/v1/system/restart' \
-			--header 'Content-Type: application/json' \
-			--header 'Accept: application/json' \
-			--header 'Content-Length: 0' \
-			--header "Girder-Token: $$(docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
-				curl 'http://localhost:8080/api/v1/user/authentication' \
-				--basic --user admin:arglebargle123 \
-					| jq -r .authToken.token)"
+        docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -r /gwvolman/requirements.txt -e /gwvolman
+        docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
+                curl -XPUT -s 'http://localhost:8080/api/v1/system/restart' \
+                        --header 'Content-Type: application/json' \
+                        --header 'Accept: application/json' \
+                        --header 'Content-Length: 0' \
+                        --header "Girder-Token: $$(docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
+                                curl 'http://localhost:8080/api/v1/user/authentication' \
+                                --basic --user admin:arglebargle123 \
+                                        | jq -r .authToken.token)"
+
 	
 rebuild_dashboard: src/dashboard
 	sed -e "s|apiHOST|https://girder.local.wholetale.org|g" \
