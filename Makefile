@@ -62,8 +62,8 @@ dev: services
 
 restart_girder:
 	which jq || (echo "Please install jq to execute the 'restart_girder' make target" && exit 1)
-        docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -r /gwvolman/requirements.txt -e /gwvolman
-        docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
+	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -r /gwvolman/requirements.txt -e /gwvolman
+	docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
                 curl -XPUT -s 'http://localhost:8080/api/v1/system/restart' \
                         --header 'Content-Type: application/json' \
                         --header 'Accept: application/json' \
