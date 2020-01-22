@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import json
 import requests
 import time
@@ -156,7 +156,7 @@ i_params = {
         "squarelogo-greytext-orangebody-greymoons.png"
     ),
     "iframe": True,
-    "name": "Jupyter Classic",
+    "name": "Jupyter Notebook",
     "public": True,
 }
 r = requests.post(api_url + "/image", headers=headers, params=i_params)
@@ -183,7 +183,7 @@ i_params = {
     ),
     "icon": "https://www.rstudio.com/wp-content/uploads/" "2014/06/RStudio-Ball.png",
     "iframe": True,
-    "name": "RStudio (rocker/geospatial)",
+    "name": "RStudio",
     "public": True,
 }
 r = requests.post(api_url + "/image", headers=headers, params=i_params)
@@ -214,7 +214,7 @@ i_params = {
         "squarelogo-greytext-orangebody-greymoons.png"
     ),
     "iframe": True,
-    "name": "Jupyter Lab",
+    "name": "JupyterLab",
     "public": True,
 }
 r = requests.post(api_url + "/image", headers=headers, params=i_params)
