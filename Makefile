@@ -42,7 +42,7 @@ src/globus_handler:
 	git clone https://github.com/whole-tale/globus_handler src/globus_handler
 
 src/dashboard_next:
-	git clone https://github.com/bodom0015/wt-ng-dash src/wt_ng_dashboard
+	git clone https://github.com/whole-tale/ngx-dashboard src/wt_ng_dashboard
 
 sources: src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard src/globus_handler src/girderfs src/dashboard_next
 
