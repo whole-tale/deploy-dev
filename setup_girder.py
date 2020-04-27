@@ -274,4 +274,33 @@ r = requests.post(api_url + "/image", headers=headers, params=i_params)
 r.raise_for_status()
 image = r.json()
 
+print('Create Jupyter with R image')
+i_params = {
+    'config': json.dumps({
+        'command': (
+            'jupyter notebook --no-browser --port {port} --ip=0.0.0.0 '
+            '--NotebookApp.token={token} --NotebookApp.base_url=/{base_path} '
+            '--NotebookApp.port_retries=0'
+        ),
+        'environment': ['CSP_HOSTS=dashboard.local.wholetale.org'],
+        'memLimit': '2048m',
+        'port': 8888,
+        'targetMount': '/home/jovyan/work',
+        'urlPath': '?token={token}',
+        'buildpack': 'RBuildPack',
+        'user': 'jovyan'
+    }),
+    'icon': (
+        'https://raw.githubusercontent.com/whole-tale/jupyter-base/master/'
+        'squarelogo-greytext-orangebody-greymoons.png'
+    ),
+    'iframe': True,
+    'name': 'Jupyter with R',
+    'public': True
+}
+r = requests.post(api_url + '/image', headers=headers,
+                  params=i_params)
+r.raise_for_status()
+image = r.json()
+
 final_msg()
