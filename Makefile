@@ -2,7 +2,7 @@
 	rebuild_dashboard rebuild_dashboard_next watch_dashboard watch_dashboard_dev watch_dashboard_next \
 	restart_worker restart_girder globus_handler_src
 
-SUBDIRS = ps homes src
+SUBDIRS = volumes/ps volumes/workspaces volumes/homes volumes/versions volumes/runs
 TAG = latest
 MEM_LIMIT = 2048
 NODE = node --max_old_space_size=${MEM_LIMIT}
@@ -19,6 +19,9 @@ images:
 	docker pull wholetale/gwvolman:$(TAG)
 	docker pull wholetale/repo2docker_wholetale:$(TAG)
 
+src:
+	@mkdir src
+
 src/girderfs:
 	git clone https://github.com/whole-tale/girderfs src/girderfs
 
@@ -34,6 +37,12 @@ src/wt_data_manager:
 src/wt_home_dir:
 	git clone https://github.com/whole-tale/wt_home_dirs src/wt_home_dir
 
+src/wt_versioning:
+	git clone https://github.com/whole-tale/wt_home_dirs src/wt_versioning
+
+src/virtual_resources:
+	git clone https://github.com/whole-tale/wt_home_dirs src/virtual_resources
+
 src/dashboard:
 	git clone https://github.com/whole-tale/dashboard src/dashboard
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c "$$(cat dashboard_local/initial_build.sh)"
@@ -44,12 +53,12 @@ src/globus_handler:
 src/ngx-dashboard:
 	git clone https://github.com/whole-tale/ngx-dashboard src/ngx-dashboard
 
-sources: src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard src/globus_handler src/girderfs src/ngx-dashboard
+sources: src src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard src/globus_handler src/girderfs src/ngx-dashboard src/wt_versioning src/virtual_resources
 
 dirs: $(SUBDIRS)
 
 $(SUBDIRS):
-	@mkdir $@
+	@sudo mkdir -p $@
 
 services: dirs sources
 
@@ -64,8 +73,8 @@ dev: services
 	done; \
 	true
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -r /gwvolman/requirements.txt -e /gwvolman
-	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install plugin plugins/wt_data_manager plugins/wholetale plugins/wt_home_dir plugins/globus_handler
-	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir,globus_handler
+	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install plugin plugins/wt_data_manager plugins/wholetale plugins/wt_home_dir plugins/globus_handler plugins/virtual_resources plugins/wt_versioning
+	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir,globus_handler,wt_versioning
 	./setup_girder.py
 
 restart_girder:

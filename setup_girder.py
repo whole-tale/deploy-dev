@@ -67,6 +67,8 @@ plugins = [
     "wt_data_manager",
     "wholetale",
     "wt_home_dir",
+    "wt_versioning",
+    "virtual_resources",
 ]
 r = requests.put(
     api_url + "/system/plugins",
@@ -126,12 +128,39 @@ settings = [
         "key": "wholetale.dataverse_extra_hosts",
         "value": ["https://dev2.dataverse.org", "https://demo.dataverse.org"],
     },
+    {"key": "dm.private_storage_path", "value": "/tmp/data/ps"},
+    {"key": "wthome.homedir_root", "value": "/tmp/data/homes"},
+    {"key": "wthome.taledir_root", "value": "/tmp/data/workspaces"},
+    {"key": "wtversioning.runs_root", "value": "/tmp/data/runs"},
+    {"key": "wtversioning.versions_root", "value": "/tmp/data/versions"},
 ]
 
 r = requests.put(
     api_url + "/system/setting", headers=headers, params={"list": json.dumps(settings)}
 )
 r.raise_for_status()
+
+# wt_homes assetstore needs to be updated manually
+print("Updating assetstores")
+r = requests.get(api_url + "/assetstore", headers=headers)
+r.raise_for_status()
+for assetstore in r.json():
+    update = assetstore["type"] in {100, 101}
+    if assetstore["type"] == 100:
+        rootpath = "/tmp/data/homes"
+    elif assetstore["type"] == 101:
+        rootpath = "/tmp/data/workspaces"
+    if update:
+        r = requests.put(
+            api_url + "/assetstore/{_id}".format(**assetstore),
+            headers=headers,
+            params={
+                "name": assetstore["name"],
+                "root": rootpath,
+                "current": assetstore["current"],
+            },
+        )
+        r.raise_for_status()
 
 print("Create a Jupyter image")
 i_params = {
@@ -159,6 +188,7 @@ i_params = {
     "name": "Jupyter Notebook",
     "public": True,
 }
+
 r = requests.post(api_url + "/image", headers=headers, params=i_params)
 r.raise_for_status()
 image = r.json()
@@ -274,33 +304,37 @@ r = requests.post(api_url + "/image", headers=headers, params=i_params)
 r.raise_for_status()
 image = r.json()
 
-print('Create Jupyter with R image')
+print("Create Jupyter with R image")
 i_params = {
-    'config': json.dumps({
-        'command': (
-            'jupyter notebook --no-browser --port {port} --ip=0.0.0.0 '
-            '--NotebookApp.token={token} --NotebookApp.base_url=/{base_path} '
-            '--NotebookApp.port_retries=0'
-        ),
-        'environment': ['CSP_HOSTS=dashboard.local.wholetale.org'],
-        'memLimit': '2048m',
-        'port': 8888,
-        'targetMount': '/home/jovyan/work',
-        'urlPath': '?token={token}',
-        'buildpack': 'RBuildPack',
-        'user': 'jovyan'
-    }),
-    'icon': (
-        'https://raw.githubusercontent.com/whole-tale/jupyter-base/master/'
-        'squarelogo-greytext-orangebody-greymoons.png'
+    "config": json.dumps(
+        {
+            "command": (
+                "jupyter notebook --no-browser --port {port} --ip=0.0.0.0 "
+                "--NotebookApp.token={token} --NotebookApp.base_url=/{base_path} "
+                "--NotebookApp.port_retries=0"
+            ),
+            "environment": ["CSP_HOSTS=dashboard.local.wholetale.org"],
+            "memLimit": "2048m",
+            "port": 8888,
+            "targetMount": "/home/jovyan/work",
+            "urlPath": "?token={token}",
+            "buildpack": "RBuildPack",
+            "user": "jovyan",
+        }
     ),
-    'iframe': True,
-    'name': 'Jupyter with R',
-    'public': True
+    "icon": (
+        "https://raw.githubusercontent.com/whole-tale/jupyter-base/master/"
+        "squarelogo-greytext-orangebody-greymoons.png"
+    ),
+    "iframe": True,
+    "name": "Jupyter with R",
+    "public": True,
 }
-r = requests.post(api_url + '/image', headers=headers,
-                  params=i_params)
+r = requests.post(api_url + "/image", headers=headers, params=i_params)
 r.raise_for_status()
 image = r.json()
 
+print("Restarting girder to update WebDav roots")
+r = requests.put(api_url + "/system/restart", headers=headers)
+r.raise_for_status()
 final_msg()
