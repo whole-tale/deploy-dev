@@ -91,6 +91,18 @@ $ sudo ssh -L 443:localhost:443 user@VM
 
 You should now be able to open a browser to https://dashboard.local.wholetale.org to access your running instance of Whole Tale.
 
+Modifications
+---------
+Anytime you modify `docker-stack.yml`, you will need to run `make dev` to see those changes reflected in Docker.
+
+### Development Modifications
+If you plan to modify and rebuild the dashboard code, you can follow these steps:
+1. First, run a `make rebuild_dashboard`
+2. Under `dashboard` in `docker-stack.yml`, uncomment the relevant `volumes` section u
+3. Run `make dev` to deploy `docker-stack.yml` to the swarm
+
+NOTE: if you fail to run `make rebuild_dashboard` first, Docker may create your `dist/` directory with incorrect permissions (which can lead to headaches later when writing build artifacts or serving built artifacts via NGINX)
+
 Uninstall
 ---------
 
