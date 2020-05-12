@@ -38,10 +38,10 @@ src/wt_home_dir:
 	git clone https://github.com/whole-tale/wt_home_dirs src/wt_home_dir
 
 src/wt_versioning:
-	git clone https://github.com/whole-tale/wt_home_dirs src/wt_versioning
+	git clone https://github.com/whole-tale/wt_versioning src/wt_versioning
 
 src/virtual_resources:
-	git clone https://github.com/whole-tale/wt_home_dirs src/virtual_resources
+	git clone https://github.com/whole-tale/virtual_resources src/virtual_resources
 
 src/dashboard:
 	git clone https://github.com/whole-tale/dashboard src/dashboard
