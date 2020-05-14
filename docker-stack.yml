@@ -71,7 +71,7 @@ services:
       labels:
         - "traefik.enable=false"
 
-  dashboard:
+  dashboard_old:
     image: wholetale/dashboardproxy:latest
     # build: ./dashboard_local
     networks:
@@ -87,14 +87,14 @@ services:
       replicas: 1
       labels:
         - "traefik.port=80"
-        - "traefik.frontend.rule=Host:dashboard.local.wholetale.org"
+        - "traefik.frontend.rule=Host:legacy.local.wholetale.org"
         - "traefik.enable=true"
         - "traefik.docker.network=wt_traefik-net"
         - "traefik.frontend.passHostHeader=true"
         - "traefik.frontend.entryPoints=https"
 
-  dashboard_next:
-    image: bodom0015/ng-dashboard:wt
+  dashboard:
+    image: wholetale/ngx-dashboard:latest
     networks:
       - traefik-net
     environment:
@@ -106,7 +106,7 @@ services:
       replicas: 1
       labels:
         - "traefik.port=80"
-        - "traefik.frontend.rule=Host:next.local.wholetale.org"
+        - "traefik.frontend.rule=Host:dashboard.local.wholetale.org"
         - "traefik.enable=true"
         - "traefik.docker.network=wt_traefik-net"
         - "traefik.frontend.passHostHeader=true"
