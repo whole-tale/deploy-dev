@@ -2,7 +2,7 @@
 	rebuild_dashboard rebuild_dashboard_next watch_dashboard watch_dashboard_dev watch_dashboard_next \
 	restart_worker restart_girder globus_handler_src
 
-SUBDIRS = volumes/ps volumes/workspaces volumes/homes volumes/versions volumes/runs
+SUBDIRS = volumes/ps volumes/workspaces volumes/homes volumes/versions volumes/runs volumes/base
 TAG = latest
 MEM_LIMIT = 2048
 NODE = node --max_old_space_size=${MEM_LIMIT}

@@ -49,11 +49,9 @@ r = requests.post(
     api_url + "/assetstore",
     headers=headers,
     params={
-        "type": 1,
-        "name": "GridFS",
-        "db": "gridfs",
-        "shard": False,
-        "replicaset": None,
+        "type": 0,
+        "name": "Base",
+        "root": "/tmp/data/base",
     },
 )
 
