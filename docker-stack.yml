@@ -15,9 +15,9 @@ services:
       - ./traefik/acme:/acme
     deploy:
       replicas: 1
-    #environment:
-    #  - GODADDY_API_KEY=...
-    #  - GODADDY_API_SECRET=...
+    environment:
+      - GODADDY_API_KEY=$WT_GODADDY_API_KEY
+      - GODADDY_API_SECRET=$WT_GODADDY_API_SECRET
 
   mongo:
     image: mongo:3.2
