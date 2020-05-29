@@ -124,7 +124,7 @@ settings = [
     {"key": "dm.globus_gc_dir", "value": "/opt/globusconnectpersonal"},
     {
         "key": "wholetale.dataverse_extra_hosts",
-        "value": ["https://dev2.dataverse.org", "https://demo.dataverse.org"],
+        "value": ["dev2.dataverse.org", "demo.dataverse.org"],
     },
 ]
 
