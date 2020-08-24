@@ -7,7 +7,7 @@ TAG = latest
 MEM_LIMIT = 2048
 NODE = node --max_old_space_size=${MEM_LIMIT}
 NG = ${NODE} ./node_modules/@angular/cli/bin/ng
-YARN = ${NODE} /usr/local/bin/yarn
+YARN = /usr/local/bin/yarn
 
 images:
 	docker pull traefik:alpine
