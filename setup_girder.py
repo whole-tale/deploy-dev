@@ -49,11 +49,9 @@ r = requests.post(
     api_url + "/assetstore",
     headers=headers,
     params={
-        "type": 1,
-        "name": "GridFS",
-        "db": "gridfs",
-        "shard": False,
-        "replicaset": None,
+        "type": 0,
+        "name": "Base",
+        "root": "/tmp/data/base",
     },
 )
 
@@ -64,6 +62,7 @@ plugins = [
     "jobs",
     "worker",
     "globus_handler",
+    "virtual_resources",
     "wt_data_manager",
     "wholetale",
     "wt_home_dir",
@@ -126,6 +125,9 @@ settings = [
         "key": "wholetale.dataverse_extra_hosts",
         "value": ["dev2.dataverse.org", "demo.dataverse.org"],
     },
+    {"key": "dm.private_storage_path", "value": "/tmp/data/ps"},
+    {"key": "wthome.homedir_root", "value": "/tmp/data/homes"},
+    {"key": "wthome.taledir_root", "value": "/tmp/data/workspaces"},
 ]
 
 r = requests.put(
@@ -303,4 +305,7 @@ r = requests.post(api_url + '/image', headers=headers,
 r.raise_for_status()
 image = r.json()
 
+print("Restarting girder to update WebDav roots")
+r = requests.put(api_url + "/system/restart", headers=headers)
+r.raise_for_status()
 final_msg()

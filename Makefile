@@ -2,7 +2,7 @@
 	rebuild_dashboard_old rebuild_dashboard watch_dashboard_old watch_dashboard_old_dev watch_dashboard \
 	restart_worker restart_girder globus_handler_src
 
-SUBDIRS = ps homes src
+SUBDIRS = src volumes/ps volumes/workspaces volumes/homes volumes/base
 TAG = latest
 MEM_LIMIT = 2048
 NODE = node --max_old_space_size=${MEM_LIMIT}
@@ -35,6 +35,9 @@ src/wt_data_manager:
 src/wt_home_dir:
 	git clone https://github.com/whole-tale/wt_home_dirs src/wt_home_dir
 
+src/virtual_resources:
+	git clone https://github.com/whole-tale/virtual_resources src/virtual_resources
+
 src/dashboard:
 	git clone https://github.com/whole-tale/dashboard src/dashboard
 	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c "$$(cat dashboard_local/initial_build.sh)"
@@ -45,12 +48,12 @@ src/globus_handler:
 src/ngx-dashboard:
 	git clone https://github.com/whole-tale/ngx-dashboard src/ngx-dashboard
 
-sources: src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard src/globus_handler src/girderfs src/ngx-dashboard
+sources: src src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard src/globus_handler src/girderfs src/ngx-dashboard src/virtual_resources
 
 dirs: $(SUBDIRS)
 
 $(SUBDIRS):
-	@mkdir $@
+	@sudo mkdir -p $@
 
 services: dirs sources
 
@@ -65,7 +68,7 @@ dev: services
 	done; \
 	true
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -r /gwvolman/requirements.txt -e /gwvolman
-	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install plugin plugins/wt_data_manager plugins/wholetale plugins/wt_home_dir plugins/globus_handler
+	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install plugin plugins/wt_data_manager plugins/wholetale plugins/wt_home_dir plugins/globus_handler plugins/virtual_resources
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir,globus_handler
 	./setup_girder.py
 
@@ -135,3 +138,4 @@ clean:
 	  limit="$$((limit-1))" ; \
 	done; true
 	-docker volume rm wt_mongo-cfg wt_mongo-data
+	-sudo rm -rf volumes/*
