@@ -18,7 +18,7 @@ fi
 
 # Default parameter to all subdirs
 if [ "$1" == "" ]; then
-	subdirs="dashboard,wholetale,gwvolman,wt_data_manager,wt_home_dir,globus_handler"
+	subdirs="ngx-dashboard,dashboard,wholetale,gwvolman,wt_data_manager,wt_home_dir,globus_handler"
 else
 	subdirs="$1"
 fi
