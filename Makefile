@@ -2,7 +2,7 @@
 	rebuild_dashboard_old rebuild_dashboard watch_dashboard_old watch_dashboard_old_dev watch_dashboard \
 	restart_worker restart_girder globus_handler_src
 
-SUBDIRS = src volumes/ps volumes/workspaces volumes/homes volumes/base
+SUBDIRS = src volumes/ps volumes/workspaces volumes/homes volumes/base volumes/versions volumes/runs
 TAG = latest
 MEM_LIMIT = 2048
 NODE = node --max_old_space_size=${MEM_LIMIT}
@@ -35,6 +35,9 @@ src/wt_data_manager:
 src/wt_home_dir:
 	git clone https://github.com/whole-tale/wt_home_dirs src/wt_home_dir
 
+src/wt_versioning:
+	git clone https://github.com/whole-tale/wt_versioning src/wt_versioning
+
 src/virtual_resources:
 	git clone https://github.com/whole-tale/virtual_resources src/virtual_resources
 
@@ -48,7 +51,7 @@ src/globus_handler:
 src/ngx-dashboard:
 	git clone https://github.com/whole-tale/ngx-dashboard src/ngx-dashboard
 
-sources: src src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard src/globus_handler src/girderfs src/ngx-dashboard src/virtual_resources
+sources: src src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard src/globus_handler src/girderfs src/ngx-dashboard src/virtual_resources src/wt_versioning
 
 dirs: $(SUBDIRS)
 
@@ -68,7 +71,7 @@ dev: services
 	done; \
 	true
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -r /gwvolman/requirements.txt -e /gwvolman
-	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install plugin plugins/wt_data_manager plugins/wholetale plugins/wt_home_dir plugins/globus_handler plugins/virtual_resources
+	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install plugin plugins/wt_data_manager plugins/wholetale plugins/wt_home_dir plugins/globus_handler plugins/virtual_resources plugins/wt_versioning
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir,globus_handler
 	./setup_girder.py
 

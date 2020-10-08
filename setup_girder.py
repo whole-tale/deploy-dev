@@ -66,6 +66,7 @@ plugins = [
     "wt_data_manager",
     "wholetale",
     "wt_home_dir",
+    "wt_versioning",
 ]
 r = requests.put(
     api_url + "/system/plugins",
@@ -128,6 +129,8 @@ settings = [
     {"key": "dm.private_storage_path", "value": "/tmp/data/ps"},
     {"key": "wthome.homedir_root", "value": "/tmp/data/homes"},
     {"key": "wthome.taledir_root", "value": "/tmp/data/workspaces"},
+    {"key": "wtversioning.runs_root", "value": "/tmp/data/runs"},
+    {"key": "wtversioning.versions_root", "value": "/tmp/data/versions"},
 ]
 
 r = requests.put(
