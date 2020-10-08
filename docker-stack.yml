@@ -37,20 +37,19 @@ services:
       - celery
       - mongo
     volumes:
-      - ./homes:/tmp/wt-home-dirs
-      - ./homes:/tmp/wt-tale-dirs
-      - ./ps:/tmp/ps
+      - ./volumes:/tmp/data
       - ./girder/girder.local.cfg:/girder/girder/conf/girder.local.cfg
       - ./src/wholetale:/girder/plugins/wholetale
       - ./src/wt_data_manager:/girder/plugins/wt_data_manager
       - ./src/wt_home_dir:/girder/plugins/wt_home_dir
       - ./src/globus_handler:/girder/plugins/globus_handler
+      - ./src/virtual_resources:/girder/plugins/virtual_resources
       - ./src/gwvolman:/gwvolman
     environment:
       - DOMAIN=local.wholetale.org
       - DASHBOARD_URL=https://dashboard.local.wholetale.org
       - GOSU_USER=girder:girder
-      - "GOSU_CHOWN=/tmp/wt-home-dirs /tmp/wt-tale-dirs /tmp/ps"
+      - "GOSU_CHOWN=/tmp/data"
       - DATAONE_URL=https://cn-stage-2.test.dataone.org/cn
     deploy:
       replicas: 1
