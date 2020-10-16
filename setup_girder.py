@@ -313,6 +313,38 @@ r = requests.post(api_url + '/image', headers=headers,
 r.raise_for_status()
 image = r.json()
 
+print('Create Jupyter with Matlab image')
+i_params = {
+    'config': json.dumps({
+        'command': (
+            'jupyter notebook --no-browser --port {port} --ip=0.0.0.0 '
+            '--NotebookApp.token={token} --NotebookApp.base_url=/{base_path} '
+            '--NotebookApp.port_retries=0'
+        ),
+        'environment': [
+            'CSP_HOSTS=dashboard.local.wholetale.org',
+            'VERSION=R2019b'
+        ],
+        'memLimit': '2048m',
+        'port': 8888,
+        'targetMount': '/home/jovyan/work',
+        'urlPath': '?token={token}',
+        'buildpack': 'MatlabBuildPack',
+        'user': 'jovyan'
+    }),
+    'icon': (
+        'https://raw.githubusercontent.com/whole-tale/jupyter-base/master/'
+        'squarelogo-greytext-orangebody-greymoons.png'
+    ),
+    'iframe': True,
+    'name': 'Jupyter with Matlab (R2019b)',
+    'public': True
+}
+r = requests.post(api_url + '/image', headers=headers,
+                  params=i_params)
+r.raise_for_status()
+image = r.json()
+
 print("Restarting girder to update WebDav roots")
 r = requests.put(api_url + "/system/restart", headers=headers)
 r.raise_for_status()
