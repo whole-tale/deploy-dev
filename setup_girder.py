@@ -403,6 +403,64 @@ r = requests.post(api_url + '/image', headers=headers,
 r.raise_for_status()
 image = r.json()
 
+print('Create Jupyter with Stata image')
+i_params = {
+    'config': json.dumps({
+        'command': (
+            'jupyter notebook --no-browser --port {port} --ip=0.0.0.0 '
+            '--NotebookApp.token={token} --NotebookApp.base_url=/{base_path} '
+            '--NotebookApp.port_retries=0'
+        ),
+        'environment': [
+            'VERSION=16'
+        ],
+        'memLimit': '2048m',
+        'port': 8888,
+        'targetMount': '/home/jovyan/work',
+        'urlPath': 'lab?token={token}',
+        'buildpack': 'StataBuildPack',
+        'user': 'jovyan'
+    }),
+    'icon': (
+        'https://raw.githubusercontent.com/whole-tale/stata-install/main/stata-square.png'
+    ),
+    'iframe': True,
+    'name': 'STATA (Jupyter)',
+    'public': True
+}
+r = requests.post(api_url + '/image', headers=headers,
+                  params=i_params)
+r.raise_for_status()
+image = r.json()
+
+print('Create Stata Xpra image')
+i_params = {
+    'config': json.dumps({
+        'command': (
+            'xpra start --bind-tcp=0.0.0.0:10000 --html=on --daemon=no --exit-with-children=no --start-after-connect=xstata'
+        ),
+        'environment': [
+            'VERSION=16'
+        ],
+        'memLimit': '2048m',
+        'port': 10000,
+        'targetMount': '/home/jovyan/work',
+        'urlPath': '/',
+        'buildpack': 'StataBuildPack',
+        'user': 'jovyan'
+    }),
+    'icon': (
+        'https://raw.githubusercontent.com/whole-tale/stata-install/main/stata-square.png'
+    ),
+    'iframe': True,
+    'name': 'STATA (Desktop)',
+    'public': True
+}
+r = requests.post(api_url + '/image', headers=headers,
+                  params=i_params)
+r.raise_for_status()
+image = r.json()
+
 print("Restarting girder to update WebDav roots")
 r = requests.put(api_url + "/system/restart", headers=headers)
 r.raise_for_status()
