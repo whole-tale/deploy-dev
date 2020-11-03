@@ -345,6 +345,36 @@ r = requests.post(api_url + '/image', headers=headers,
 r.raise_for_status()
 image = r.json()
 
+print('Create Matlab Xpra image')
+i_params = {
+    'config': json.dumps({
+        'command': (
+            'xpra start --bind-tcp=0.0.0.0:10000 --html=on --daemon=no --exit-with-children=no --start-after-connect="matlab -desktop"'
+        ),
+        'environment': [
+            'CSP_HOSTS=dashboard.local.wholetale.org',
+            'VERSION=R2019b'
+        ],
+        'memLimit': '2048m',
+        'port': 10000,
+        'targetMount': '/home/jovyan/work',
+        'urlPath': '/',
+        'buildpack': 'MatlabBuildPack',
+        'user': 'jovyan'
+    }),
+    'icon': (
+        'https://raw.githubusercontent.com/whole-tale/jupyter-base/master/'
+        'squarelogo-greytext-orangebody-greymoons.png'
+    ),
+    'iframe': True,
+    'name': 'Matlab R2019b (Xpra)',
+    'public': True
+}
+r = requests.post(api_url + '/image', headers=headers,
+                  params=i_params)
+r.raise_for_status()
+image = r.json()
+
 print("Restarting girder to update WebDav roots")
 r = requests.put(api_url + "/system/restart", headers=headers)
 r.raise_for_status()
