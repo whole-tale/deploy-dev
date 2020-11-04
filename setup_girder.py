@@ -328,16 +328,16 @@ i_params = {
         'memLimit': '2048m',
         'port': 8888,
         'targetMount': '/home/jovyan/work',
-        'urlPath': '?token={token}',
+        'urlPath': 'lab?token={token}',
         'buildpack': 'MatlabBuildPack',
         'user': 'jovyan'
     }),
     'icon': (
-        'https://raw.githubusercontent.com/whole-tale/jupyter-base/master/'
-        'squarelogo-greytext-orangebody-greymoons.png'
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/'
+        'Matlab_Logo.png/267px-Matlab_Logo.png'
     ),
     'iframe': True,
-    'name': 'Jupyter with Matlab (R2019b)',
+    'name': 'MATLAB (Jupyter)',
     'public': True
 }
 r = requests.post(api_url + '/image', headers=headers,
@@ -363,11 +363,11 @@ i_params = {
         'user': 'jovyan'
     }),
     'icon': (
-        'https://raw.githubusercontent.com/whole-tale/jupyter-base/master/'
-        'squarelogo-greytext-orangebody-greymoons.png'
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/'
+        'Matlab_Logo.png/267px-Matlab_Logo.png'
     ),
     'iframe': True,
-    'name': 'Matlab R2019b (Xpra)',
+    'name': 'MATLAB (Desktop)',
     'public': True
 }
 r = requests.post(api_url + '/image', headers=headers,
