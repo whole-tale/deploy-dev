@@ -126,6 +126,10 @@ tail_girder_err:
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
 		tail -n 200 /home/girder/.girder/logs/error.log
 
+reset_girder:
+	docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
+		python3 -c 'from girder.models import getDbConnection;getDbConnection().drop_database("girder")'
+
 clean:
 	-./stop_worker.sh
 	-./destroy_instances.py
