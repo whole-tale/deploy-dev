@@ -9,7 +9,8 @@ System requirements
  * Linux (tested on Ubuntu 18.04, CoreOS; not working on MacOS _yet_)
  * docker 17.04.0+, swarm mode
  * python, requests
- * make (optional)
+ * jq
+ * make
  * Globus OAuth credentials (pinned at `#core-dev`)
  * SSL certs for .local.wholetale.org (pinned at `#core-dev`)
  * Default user with uid:1000 and gid:100
@@ -45,6 +46,13 @@ export GLOBUS_CLIENT_ID=<client ID>
 export GLOBUS_CLIENT_SECRET=<client secret>
 ```
 
+Export ORCID ID and secret (available on `#core-dev`):
+```
+export ORCID_CLIENT_ID=<client ID>
+export ORCID_CLIENT_SECRET=<client secret>
+```
+
+
 Clone this repository:
 
 ```
@@ -62,7 +70,6 @@ sudo chmod 0600 traefik/acme/acme.json
 
 Run:
 ```
-make services
 make dev
 ```
 
