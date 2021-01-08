@@ -46,6 +46,7 @@ services:
       - ./src/globus_handler:/girder/plugins/globus_handler
       - ./src/virtual_resources:/girder/plugins/virtual_resources
       - ./src/gwvolman:/gwvolman
+      - ./src/girderfs:/girderfs
     environment:
       - DOMAIN=local.wholetale.org
       - DASHBOARD_URL=https://dashboard.local.wholetale.org
