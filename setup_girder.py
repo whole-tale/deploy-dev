@@ -126,6 +126,10 @@ settings = [
         "key": "wholetale.dataverse_extra_hosts",
         "value": ["dev2.dataverse.org", "demo.dataverse.org"],
     },
+    {
+        "key": "wholetale.zenodo_extra_hosts",
+        "value": ["https://sandbox.zenodo.org/record/"]
+    },
     {"key": "dm.private_storage_path", "value": "/tmp/data/ps"},
     {"key": "wthome.homedir_root", "value": "/tmp/data/homes"},
     {"key": "wthome.taledir_root", "value": "/tmp/data/workspaces"},
@@ -136,7 +140,13 @@ settings = [
 r = requests.put(
     api_url + "/system/setting", headers=headers, params={"list": json.dumps(settings)}
 )
-r.raise_for_status()
+try:
+    r.raise_for_status()
+except requests.exceptions.HTTPError:
+    if r.status_code >= 400 and r.status_code < 500:
+        print(f"Request died with {r.status_code}: {r.reason}")
+        print(f"Returned: {r.text}")
+    raise
 
 print("Create a Jupyter image")
 i_params = {
