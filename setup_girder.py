@@ -157,7 +157,6 @@ i_params = {
                 "--NotebookApp.token={token} --NotebookApp.base_url=/{base_path} "
                 "--NotebookApp.port_retries=0"
             ),
-            "environment": ["CSP_HOSTS=dashboard.local.wholetale.org"],
             "memLimit": "2048m",
             "port": 8888,
             "targetMount": "/home/jovyan/work",
@@ -185,7 +184,6 @@ i_params = {
         {
             "command": "/start.sh",
             "environment": [
-                "CSP_HOSTS=dashboard.local.wholetale.org",
                 "PASSWORD=djkslajdklasjdklsajd",
             ],
             "memLimit": "2048m",
@@ -214,7 +212,6 @@ i_params = {
                 "--NotebookApp.token={token} --NotebookApp.base_url=/{base_path} "
                 "--NotebookApp.port_retries=0"
             ),
-            "environment": ["CSP_HOSTS=dashboard.local.wholetale.org"],
             "memLimit": "2048m",
             "port": 8888,
             "targetMount": "/home/jovyan/work",
@@ -268,7 +265,6 @@ i_params = {
                 "--NotebookApp.token={token} --NotebookApp.base_url=/{base_path} "
                 "--NotebookApp.port_retries=0"
             ),
-            "environment": ["CSP_HOSTS=dashboard.local.wholetale.org"],
             "memLimit": "2048m",
             "port": 8888,
             "targetMount": "/home/jovyan/work",
@@ -297,7 +293,6 @@ i_params = {
             '--NotebookApp.token={token} --NotebookApp.base_url=/{base_path} '
             '--NotebookApp.port_retries=0'
         ),
-        'environment': ['CSP_HOSTS=dashboard.local.wholetale.org'],
         'memLimit': '2048m',
         'port': 8888,
         'targetMount': '/home/jovyan/work',
