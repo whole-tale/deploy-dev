@@ -2,7 +2,7 @@
 	rebuild_dashboard_old rebuild_dashboard watch_dashboard_old watch_dashboard_old_dev watch_dashboard \
 	restart_worker restart_girder globus_handler_src
 
-SUBDIRS = src volumes/ps volumes/workspaces volumes/homes volumes/base volumes/versions volumes/runs
+SUBDIRS = src volumes/ps volumes/workspaces volumes/homes volumes/base volumes/versions volumes/runs volumes/licenses
 TAG = latest
 MEM_LIMIT = 2048
 NODE = node --max_old_space_size=${MEM_LIMIT}
@@ -146,4 +146,4 @@ clean:
 	  limit="$$((limit-1))" ; \
 	done; true
 	-docker volume rm wt_mongo-cfg wt_mongo-data
-	-sudo rm -rf volumes/*
+	-sudo rm -rf volumes/{ps,workspaces,homes,base,versions,runs}
