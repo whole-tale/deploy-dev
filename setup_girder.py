@@ -313,6 +313,96 @@ r = requests.post(api_url + '/image', headers=headers,
 r.raise_for_status()
 image = r.json()
 
+print('Create Jupyter with Matlab image')
+i_params = {
+    'config': json.dumps({
+        'command': (
+            'jupyter notebook --no-browser --port {port} --ip=0.0.0.0 '
+            '--NotebookApp.token={token} --NotebookApp.base_url=/{base_path} '
+            '--NotebookApp.port_retries=0'
+        ),
+        'environment': [
+            'VERSION=R2020b'
+        ],
+        'memLimit': '2048m',
+        'port': 8888,
+        'targetMount': '/home/jovyan/work',
+        'urlPath': 'lab?token={token}',
+        'buildpack': 'MatlabBuildPack',
+        'user': 'jovyan'
+    }),
+    'icon': (
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/'
+        'Matlab_Logo.png/267px-Matlab_Logo.png'
+    ),
+    'iframe': True,
+    'name': 'MATLAB (Jupyter Kernel)',
+    'public': True
+}
+r = requests.post(api_url + '/image', headers=headers,
+                  params=i_params)
+r.raise_for_status()
+image = r.json()
+
+print('Create Matlab Xpra image')
+i_params = {
+    'config': json.dumps({
+        'command': (
+            'xpra start --bind-tcp=0.0.0.0:10000 --html=on --daemon=no --exit-with-children=no --start-after-connect="matlab -desktop"'
+        ),
+        'environment': [
+            'VERSION=R2020b'
+        ],
+        'memLimit': '2048m',
+        'port': 10000,
+        'targetMount': '/home/jovyan/work',
+        'urlPath': '/',
+        'buildpack': 'MatlabBuildPack',
+        'user': 'jovyan'
+    }),
+    'icon': (
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/'
+        'Matlab_Logo.png/267px-Matlab_Logo.png'
+    ),
+    'iframe': True,
+    'name': 'MATLAB (Linux Desktop)',
+    'public': True
+}
+r = requests.post(api_url + '/image', headers=headers,
+                  params=i_params)
+r.raise_for_status()
+image = r.json()
+
+print('Create Matlab Web Desktop image')
+i_params = {
+    'config': json.dumps({
+        'command': (
+            'matlab-jupyter-app'
+        ),
+        'environment': [
+            'VERSION=R2020b'
+        ],
+        'memLimit': '2048m',
+        'port': 8888,
+        'targetMount': '/home/jovyan/work',
+        'urlPath': 'matlab/index.html',
+        'buildpack': 'MatlabBuildPack',
+        'user': 'jovyan',
+        'csp': "default-src 'self' *.mathworks.com:*; style-src 'self' 'unsafe-inline' *.mathworks.com:*; script-src 'self' 'unsafe-inline' 'unsafe-eval' *.mathworks.com:*; img-src 'self' *.mathworks.com:* data:; frame-ancestors 'self' *.mathworks.com:* dashboard.local.wholetale.org; frame-src 'self' *.mathworks.com:*; connect-src 'self' *.mathworks.com:* wss://localhost:* wss://127.0.0.1:*"
+    }),
+    'icon': (
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/'
+        'Matlab_Logo.png/267px-Matlab_Logo.png'
+    ),
+    'iframe': True,
+    'name': 'MATLAB (Desktop)',
+    'public': True
+}
+r = requests.post(api_url + '/image', headers=headers,
+                  params=i_params)
+r.raise_for_status()
+image = r.json()
+
 print("Restarting girder to update WebDav roots")
 r = requests.put(api_url + "/system/restart", headers=headers)
 r.raise_for_status()
