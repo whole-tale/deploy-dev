@@ -1,6 +1,6 @@
 .PHONY: clean dirs dev images gwvolman_src wholetale_src dms_src home_src sources \
 	rebuild_dashboard watch_dashboard \
-	restart_worker restart_girder globus_handler_src
+	restart_worker restart_girder globus_handler_src status update_src
 
 SUBDIRS = src volumes/ps volumes/workspaces volumes/homes volumes/base volumes/versions volumes/runs volumes/licenses
 TAG = latest
@@ -119,3 +119,9 @@ clean:
 	done; true
 	-docker volume rm wt_mongo-cfg wt_mongo-data
 	-sudo rm -rf volumes/{ps,workspaces,homes,base,versions,runs}
+
+status:
+	@-./scripts/git_status.sh
+
+update_src:
+	@-./scripts/git_pull_master.sh
