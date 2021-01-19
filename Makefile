@@ -1,5 +1,5 @@
-.PHONY: clean dirs dev images gwvolman_src wholetale_src dms_src home_src dashboard_src sources \
-	rebuild_dashboard_old rebuild_dashboard watch_dashboard_old watch_dashboard_old_dev watch_dashboard \
+.PHONY: clean dirs dev images gwvolman_src wholetale_src dms_src home_src sources \
+	rebuild_dashboard watch_dashboard \
 	restart_worker restart_girder globus_handler_src
 
 SUBDIRS = src volumes/ps volumes/workspaces volumes/homes volumes/base volumes/versions volumes/runs volumes/licenses
@@ -41,17 +41,13 @@ src/wt_versioning:
 src/virtual_resources:
 	git clone https://github.com/whole-tale/virtual_resources src/virtual_resources
 
-src/dashboard:
-	git clone https://github.com/whole-tale/dashboard src/dashboard
-	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c "$$(cat dashboard_local/initial_build.sh)"
-
 src/globus_handler:
 	git clone https://github.com/whole-tale/globus_handler src/globus_handler
 
 src/ngx-dashboard:
 	git clone https://github.com/whole-tale/ngx-dashboard src/ngx-dashboard
 
-sources: src src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/dashboard src/globus_handler src/girderfs src/ngx-dashboard src/virtual_resources src/wt_versioning
+sources: src src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/globus_handler src/girderfs src/ngx-dashboard src/virtual_resources src/wt_versioning
 
 dirs: $(SUBDIRS)
 
@@ -88,30 +84,6 @@ restart_girder:
                                 curl 'http://localhost:8080/api/v1/user/authentication' \
                                 --basic --user admin:arglebargle123 \
                                         | jq -r .authToken.token)"
-
-	
-rebuild_dashboard_old: src/dashboard
-	sed -e "s|apiHOST|https://girder.local.wholetale.org|g" \
-		-e "s|dashboardHOST|https://dashboard.local.wholetale.org|g" \
-		-e "s|dataOneHOST|https://cn-stage-2.test.dataone.org|g" \
-		-e "s|dashboardDev|true|g" \
-		-e "s|authPROVIDER|Globus|g" -i src/dashboard/config/environment.js
-	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c 'NODE_ENV=development npm install && ./node_modules/.bin/ember build --environment=production'
-
-watch_dashboard_old: src/dashboard
-	sed -e "s|apiHOST|https://girder.local.wholetale.org|g" \
-                -e "s|dashboardHOST|https://dashboard.local.wholetale.org|g" \
-                -e "s|dataOneHOST|https://cn-stage-2.test.dataone.org|g" \
-		-e "s|dashboardDev|true|g" \
-                -e "s|authPROVIDER|Globus|g" -i src/dashboard/config/environment.js
-	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c 'NODE_ENV=development npm install && ./node_modules/.bin/ember serve --environment=production'
-
-watch_dashboard_old_dev: src/dashboard
-	sed -e "s|apiHOST|https://girder.local.wholetale.org|g" \
-                -e "s|dashboardHOST|https://dashboard.local.wholetale.org|g" \
-                -e "s|dataOneHOST|https://cn-stage-2.test.dataone.org|g" \
-                -e "s|authPROVIDER|Globus|g" -i src/dashboard/config/environment.js
-	docker run --rm -ti -v $${PWD}/src/dashboard:/usr/src/node-app -w /usr/src/node-app node:carbon-slim sh -c 'NODE_ENV=development npm install && ./node_modules/.bin/ember serve'
 
 rebuild_dashboard:
 	docker run --rm --user=$${UID}:$${GID} -ti -v $${PWD}/src/ngx-dashboard:/srv/app -w /srv/app bodom0015/ng '${YARN} install --network-timeout=360000 && ${NG} build --prod --deleteOutputPath=false --progress'
