@@ -351,7 +351,7 @@ i_params = {
             'xpra start --bind-tcp=0.0.0.0:10000 --html=on --daemon=no --exit-with-children=no --start-after-connect="matlab -desktop"'
         ),
         'environment': [
-            'VERSION=R2020b '
+            'VERSION=R2020b'
         ],
         'memLimit': '2048m',
         'port': 10000,
