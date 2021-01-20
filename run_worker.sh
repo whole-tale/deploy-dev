@@ -36,7 +36,6 @@ docker run \
     -v /run/mount.davfs:/run/mount.davfs \
     -v $PWD/src/gwvolman:/gwvolman \
     -v $PWD/src/girderfs:/girderfs \
-    -v "$PWD"/volumes/licenses/:/licenses/ \
     --device /dev/fuse \
     --cap-add SYS_ADMIN \
     --cap-add SYS_PTRACE \
