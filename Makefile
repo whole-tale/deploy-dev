@@ -132,8 +132,10 @@ clean:
 	  sleep 2 ; \
 	  limit="$$((limit-1))" ; \
 	done; true
+	for dir in ps workspaces homes base versions runs ; do \
+	  sudo rm -rf volumes/$$dir ; \
+	done; true
 	-docker volume rm wt_mongo-cfg wt_mongo-data
-	-sudo rm -rf volumes/{ps,workspaces,homes,base,versions,runs}
 
 status:
 	@-./scripts/git_status.sh
