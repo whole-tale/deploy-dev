@@ -86,10 +86,25 @@ restart_girder:
                                         | jq -r .authToken.token)"
 
 rebuild_dashboard:
-	docker run --rm --user=$${UID}:$${GID} -ti -v $${PWD}/src/ngx-dashboard:/srv/app -w /srv/app bodom0015/ng '${YARN} install --network-timeout=360000 && ${NG} build --prod --deleteOutputPath=false --progress'
+	docker run \
+		--rm \
+		--user=$${UID}:$${GID} \
+		-ti \
+		-v $${PWD}/src/ngx-dashboard:/srv/app \
+		-w /srv/app bodom0015/ng \
+			'${YARN} install --network-timeout=360000 && \
+			${NG} build --prod --deleteOutputPath=false --progress'
 
 watch_dashboard:
-	docker run --rm --user=$${UID}:$${GID} -ti -v $${PWD}/src/ngx-dashboard:/srv/app -w /srv/app bodom0015/ng '${YARN} install --network-timeout=360000 && ${NG} build --prod --watch --poll 15000 --deleteOutputPath=false --progress'
+	docker run \
+		--rm \
+		--user=$${UID}:$${GID} \
+		-ti \
+		-v $${PWD}/src/ngx-dashboard:/srv/app \
+		-w /srv/app \
+		bodom0015/ng \
+			'${YARN} install --network-timeout=360000 && \
+			${NG} build --prod --watch --poll 15000 --deleteOutputPath=false --progress'
 
 restart_worker:
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -e /gwvolman
