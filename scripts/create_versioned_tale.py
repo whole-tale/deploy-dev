@@ -113,6 +113,28 @@ r = requests.post(
 )
 r.raise_for_status()
 
+# Modify tale itself
+tale["authors"].append({
+    "firstName": "Craig",
+    "lastName": "Willis",
+    "orcid": "https://orcid.org/0000-0002-6148-7196",
+})
+image = requests.get(api_url + "/image", params={"text": '"Matlab"'}).json()[
+    0
+]
+
+tale.update({
+    "category": "rocket science",
+    "config": {"foo": "bar"},
+    "dataSet": [],
+    "description": "A better description",
+    "imageId": image["_id"],
+    "title": "New better title",
+})
+r = requests.put(api_url + f"/tale/{tale['_id']}", headers=headers, json=tale)
+r.raise_for_status()
+tale = r.json()
+
 new_dir = root_workspace / "some_directory"
 new_dir.mkdir()
 shutil.move(some_file, new_dir / "moved_file")
