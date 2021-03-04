@@ -2,7 +2,7 @@ version: '3.2'
 
 services:
   traefik:
-    image: traefik:alpine
+    image: traefik:v2.4
     ports:
       - "80:80"
       - "443:443"
@@ -15,9 +15,45 @@ services:
       - ./traefik/acme:/acme
     deploy:
       replicas: 1
+      labels:
+        - "traefik.enable=false"
     environment:
       - GODADDY_API_KEY=$WT_GODADDY_API_KEY
       - GODADDY_API_SECRET=$WT_GODADDY_API_SECRET
+
+  #traefik-forward-auth:
+  #  image: thomseddon/traefik-forward-auth:2
+  #  environment:
+  #    - PROVIDERS_GENERIC_OAUTH_AUTH_URL=https://auth.globus.org/v2/oauth2/authorize
+  #    - PROVIDERS_GENERIC_OAUTH_TOKEN_URL=https://auth.globus.org/v2/oauth2/token
+  #    - PROVIDERS_GENERIC_OAUTH_USER_URL=https://auth.globus.org/v2/oauth2/identities
+  #    - PROVIDERS_GENERIC_OAUTH_SCOPE=urn:globus:auth:scope:auth.globus.org:view_identities openid profile email
+  #    - PROVIDERS_GENERIC_OAUTH_CLIENT_ID=0baa7c04-1ff6-4cf5-82b3-00dd47e828d9
+  #    - PROVIDERS_GENERIC_OAUTH_CLIENT_SECRET=7G7Yc+DWev9h0QFPdCIrAotmoSU2Wc3626+60WNCpk0=
+  #    - SECRET=026a02896709fc5ac412bd820c201b98
+  #  labels:
+  #    - "traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181"
+  #    - "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
+  #    - "traefik.http.services.traefik-forward-auth.loadbalancer.server.port=4181
+
+  whoami:
+    image: containous/whoami
+    networks:
+      - traefik-net
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.whoami.rule=Host(`whoami.local.wholetale.org`)"
+        - "traefik.http.routers.whoami.entrypoints=websecure"
+        - "traefik.http.routers.whoami.tls=true"
+        - "traefik.docker.network=wt_traefik-net"
+        - "traefik.http.services.whoami.loadbalancer.server.port=80"
+        - "traefik.http.services.whoami.loadbalancer.passhostheader=true"
+        - "traefik.http.routers.whoami.middlewares=girder"
+        - "traefik.http.middlewares.whoami.headers.customrequestheaders.X-CustomHeader=test"
+        - "traefik.http.middlewares.whoami.forwardauth.authRequestHeaders=X-CustomHeader"
+
 
   mongo:
     image: mongo:3.2
@@ -28,6 +64,8 @@ services:
       - mongo-cfg:/data/configdb
     deploy:
       replicas: 1
+      labels:
+        - "traefik.enable=false"
 
 
   girder:
@@ -56,12 +94,16 @@ services:
     deploy:
       replicas: 1
       labels:
-        - "traefik.frontend.rule=Host:girder.local.wholetale.org"
-        - "traefik.port=8080"
         - "traefik.enable=true"
+        - "traefik.http.routers.girder.rule=Host(`girder.local.wholetale.org`)"
+        - "traefik.http.routers.girder.entrypoints=websecure"
+        - "traefik.http.routers.girder.tls=true"
+        - "traefik.http.services.girder.loadbalancer.server.port=8080"
+        - "traefik.http.services.girder.loadbalancer.passhostheader=true"
         - "traefik.docker.network=wt_traefik-net"
-        - "traefik.frontend.passHostHeader=true"
-        - "traefik.frontend.entryPoints=https"
+        - "traefik.http.middlewares.girder.forwardauth.address=https://girder.local.wholetale.org/api/v1/instance/authorize/"
+        - "traefik.http.middlewares.girder.forwardauth.trustforwardheader=true"
+        - "traefik.http.middlewares.girder.forwardauth.authRequestHeaders=X-CustomHeader"
 
   redis:
     image: redis:4-stretch
@@ -71,28 +113,6 @@ services:
       replicas: 1
       labels:
         - "traefik.enable=false"
-
-  dashboard_old:
-    image: wholetale/dashboardproxy:latest
-    # build: ./dashboard_local
-    networks:
-      - traefik-net
-    environment:
-      - GIRDER_API_URL=https://girder.local.wholetale.org
-      - AUTH_PROVIDER=Globus
-      - DATAONE_URL=https://cn-stage-2.test.dataone.org
-      - DASHBOARD_DEV=true
-    volumes:
-      - ./src/dashboard/dist:/srv/dashboard
-    deploy:
-      replicas: 1
-      labels:
-        - "traefik.port=80"
-        - "traefik.frontend.rule=Host:legacy.local.wholetale.org"
-        - "traefik.enable=true"
-        - "traefik.docker.network=wt_traefik-net"
-        - "traefik.frontend.passHostHeader=true"
-        - "traefik.frontend.entryPoints=https"
 
   dashboard:
     image: wholetale/ngx-dashboard:latest
@@ -106,12 +126,13 @@ services:
     deploy:
       replicas: 1
       labels:
-        - "traefik.port=80"
-        - "traefik.frontend.rule=Host:dashboard.local.wholetale.org"
         - "traefik.enable=true"
+        - "traefik.http.routers.dashboard.rule=Host(`dashboard.local.wholetale.org`)"
+        - "traefik.http.routers.dashboard.entrypoints=websecure"
+        - "traefik.http.routers.dashboard.tls=true"
+        - "traefik.http.services.dashboard.loadbalancer.server.port=80"
+        - "traefik.http.services.dashboard.loadbalancer.passhostheader=true"
         - "traefik.docker.network=wt_traefik-net"
-        - "traefik.frontend.passHostHeader=true"
-        - "traefik.frontend.entryPoints=https"
     volumes:
       - ./src/ngx-dashboard/dist/browser/:/usr/share/nginx/html/
 
@@ -130,12 +151,13 @@ services:
     deploy:
       replicas: 1
       labels:
-        - "traefik.port=5000"
-        - "traefik.frontend.rule=Host:registry.local.wholetale.org"
         - "traefik.enable=true"
+        - "traefik.http.routers.registry.rule=Host(`registry.local.wholetale.org`)"
+        - "traefik.http.routers.registry.entrypoints=websecure"
+        - "traefik.http.routers.registry.tls=true"
+        - "traefik.http.services.registry.loadbalancer.server.port=5000"
+        - "traefik.http.services.registry.loadbalancer.passhostheader=true"
         - "traefik.docker.network=wt_traefik-net"
-        - "traefik.frontend.passHostHeader=true"
-        - "traefik.frontend.entryPoints=https"
 
 #  celery_worker:
 #    image: wholetale/gwvolman
