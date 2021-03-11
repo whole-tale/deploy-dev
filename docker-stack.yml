@@ -51,7 +51,10 @@ services:
         - "traefik.docker.network=wt_traefik-net"
         - "traefik.http.services.whoami.loadbalancer.server.port=80"
         - "traefik.http.services.whoami.loadbalancer.passhostheader=true"
-        - "traefik.http.routers.whoami.middlewares=girder"
+        - "traefik.http.routers.whoami.middlewares=girder,whoami-csp"
+        - "traefik.http.middlewares.whoami-csp.headers.contentSecurityPolicy=frame-ancestor 'self' https://dashboard.local.wholetale.org"
+        - "traefik.http.middlewares.whoami-csp.headers.customResponseHeaders.X-Custom-Response-Header=value"
+
 
   mongo:
     image: mongo:3.2
@@ -67,7 +70,7 @@ services:
 
 
   girder:
-    image: wholetale/girder:latest
+    image: wholetale/girder:cookie
     networks:
       - traefik-net
       - celery
@@ -101,7 +104,6 @@ services:
         - "traefik.docker.network=wt_traefik-net"
         - "traefik.http.middlewares.girder.forwardauth.address=http://girder:8080/api/v1/instance/authorize/"
         - "traefik.http.middlewares.girder.forwardauth.trustforwardheader=true"
-        - "traefik.http.middlewares.girder.forwardauth.authresponseheaders=Set-Cookie"
 
   redis:
     image: redis:4-stretch
