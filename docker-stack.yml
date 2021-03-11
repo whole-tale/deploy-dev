@@ -21,41 +21,6 @@ services:
       - GODADDY_API_KEY=$WT_GODADDY_API_KEY
       - GODADDY_API_SECRET=$WT_GODADDY_API_SECRET
 
-  notforyou:
-    image: containous/whoami
-    networks:
-      - traefik-net
-    deploy:
-      replicas: 1
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.notforyou.rule=Host(`notforyou.local.wholetale.org`)"
-        - "traefik.http.routers.notforyou.entrypoints=websecure"
-        - "traefik.http.routers.notforyou.tls=true"
-        - "traefik.docker.network=wt_traefik-net"
-        - "traefik.http.services.notforyou.loadbalancer.server.port=80"
-        - "traefik.http.services.notforyou.loadbalancer.passhostheader=true"
-        - "traefik.http.routers.notforyou.middlewares=girder"
-
-  whoami:
-    image: containous/whoami
-    networks:
-      - traefik-net
-    deploy:
-      replicas: 1
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.whoami.rule=Host(`whoami.local.wholetale.org`)"
-        - "traefik.http.routers.whoami.entrypoints=websecure"
-        - "traefik.http.routers.whoami.tls=true"
-        - "traefik.docker.network=wt_traefik-net"
-        - "traefik.http.services.whoami.loadbalancer.server.port=80"
-        - "traefik.http.services.whoami.loadbalancer.passhostheader=true"
-        - "traefik.http.routers.whoami.middlewares=girder,whoami-csp"
-        - "traefik.http.middlewares.whoami-csp.headers.contentSecurityPolicy=frame-ancestor 'self' https://dashboard.local.wholetale.org"
-        - "traefik.http.middlewares.whoami-csp.headers.customResponseHeaders.X-Custom-Response-Header=value"
-
-
   mongo:
     image: mongo:3.2
     networks:
