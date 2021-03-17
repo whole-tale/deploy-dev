@@ -35,7 +35,7 @@ services:
 
 
   girder:
-    image: wholetale/girder:cookie
+    image: wholetale/girder:latest
     networks:
       - traefik-net
       - celery
