@@ -21,7 +21,7 @@
     httpClientTimeout = "0s"
     defaultRule = "Host(`{{ trimPrefix `/` .Name }}.local.wholetale.org`)"
   [providers.file]
-    path=/etc/traefik/vocab.toml
+    filename="/etc/traefik/vocab.toml"
     watch=true
 
 [tls.options]
