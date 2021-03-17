@@ -107,6 +107,7 @@ settings = [
             "X-Forwarded-Host, Remote-Addr, Cache-Control"
         ),
     },
+    {"key": "core.cookie_domain", "value": ".local.wholetale.org"},
     {"key": "worker.api_url", "value": "http://girder:8080/api/v1"},
     {"key": "worker.broker", "value": "redis://redis/"},
     {"key": "worker.backend", "value": "redis://redis/"},

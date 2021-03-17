@@ -24,7 +24,7 @@ docker run \
     -e DEV=true \
     -e DOMAIN=${domain} \
     -e TRAEFIK_NETWORK=wt_traefik-net \
-    -e TRAEFIK_ENTRYPOINT=https \
+    -e TRAEFIK_ENTRYPOINT=websecure \
     -e REGISTRY_USER=${registry_user} \
     -e REGISTRY_URL=https://registry.${domain} \
     -e REGISTRY_PASS=${registry_pass} \
