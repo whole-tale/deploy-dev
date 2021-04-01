@@ -84,7 +84,7 @@ services:
     networks:
       - traefik-net
     environment:
-      - GIRDER_API_URL=https://girder.local.wholetale.org
+      - GIRDER_API_URL=https://girder.local.wholetale.org/api/v1
       - AUTH_PROVIDER=Globus
       - DATAONE_URL=https://cn-stage-2.test.dataone.org
       - DASHBOARD_DEV=true
