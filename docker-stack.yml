@@ -86,7 +86,8 @@ services:
     environment:
       - GIRDER_API_URL=https://girder.local.wholetale.org/api/v1
       - AUTH_PROVIDER=Globus
-      - DATAONE_URL=https://cn-stage-2.test.dataone.org
+      - DATAONE_URL=https://cn-stage-2.test.dataone.org/v2
+      - RTD_URL=https://wholetale.readthedocs.io/en/latest
       - DASHBOARD_DEV=true
     deploy:
       replicas: 1
