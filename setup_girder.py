@@ -338,7 +338,8 @@ i_params = {
     ),
     'iframe': True,
     'name': 'MATLAB (Jupyter Kernel)',
-    'public': True
+    'public': True,
+    'idleTimeout': 120
 }
 r = requests.post(api_url + '/image', headers=headers,
                   params=i_params)
@@ -367,7 +368,8 @@ i_params = {
     ),
     'iframe': True,
     'name': 'MATLAB (Linux Desktop)',
-    'public': True
+    'public': True,
+    'idleTimeout': 120
 }
 r = requests.post(api_url + '/image', headers=headers,
                   params=i_params)
@@ -397,7 +399,8 @@ i_params = {
     ),
     'iframe': True,
     'name': 'MATLAB (Desktop)',
-    'public': True
+    'public': True,
+    'idleTimeout': 120
 }
 r = requests.post(api_url + '/image', headers=headers,
                   params=i_params)
