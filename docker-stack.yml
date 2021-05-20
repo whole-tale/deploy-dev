@@ -86,7 +86,7 @@ services:
     environment:
       - GIRDER_API_URL=https://girder.local.wholetale.org/api/v1
       - AUTH_PROVIDER=Globus
-      - DATAONE_URL=https://cn-stage-2.test.dataone.org/v2
+      - DATAONE_URL=https://cn.dataone.org/cn/v2
       - RTD_URL=https://wholetale.readthedocs.io/en/latest
       - DASHBOARD_DEV=true
     deploy:
@@ -101,6 +101,25 @@ services:
         - "traefik.docker.network=wt_traefik-net"
     volumes:
       - ./src/ngx-dashboard/dist/browser/:/usr/share/nginx/html/
+  
+  instance-errors:
+    image: wholetale/custom-errors:latest
+    networks:
+      - traefik-net
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.instance-errors.rule=HostRegexp(`{host:tmp-.*}`)"
+        - "traefik.http.routers.instance-errors.entrypoints=websecure"
+        - "traefik.http.routers.instance-errors.tls=true"
+        - "traefik.http.routers.instance-errors.priority=1"
+        - "traefik.http.routers.instance-errors.middlewares=error-pages-middleware"
+        - "traefik.http.middlewares.error-pages-middleware.errors.status=400-599"
+        - "traefik.http.middlewares.error-pages-middleware.errors.service=instance-errors"
+        - "traefik.http.middlewares.error-pages-middleware.errors.query=/{status}.html"
+        - "traefik.http.services.instance-errors.loadbalancer.server.port=80"
+        - "traefik.docker.network=wt_traefik-net"
 
   registry:
     image: registry:2.6
