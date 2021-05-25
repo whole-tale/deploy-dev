@@ -18,7 +18,7 @@ fi
 
 # Default parameter to all subdirs
 if [ "$1" == "" ]; then
-	subdirs="dashboard,wholetale,gwvolman,wt_data_manager,wt_home_dir,globus_handler"
+	subdirs="ngx-dashboard,wholetale,gwvolman,girderfs,wt_data_manager,wt_home_dir,globus_handler,wt_versioning,virtual_resources"
 else
 	subdirs="$1"
 fi
@@ -26,5 +26,5 @@ fi
 # Loop over supplied subdirectories and pull from upstream
 for subdir in $(echo "$subdirs" | sed "s/,/ /g")
 do
-	($DEBUG cd $root_dir/src/$subdir && $DEBUG git pull origin master) || exit 1
+	($DEBUG cd $root_dir/src/$subdir && pwd && git status && $DEBUG git pull origin master) || exit 1
 done
