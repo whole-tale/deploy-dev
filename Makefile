@@ -91,9 +91,9 @@ rebuild_dashboard:
 		--user=$${UID}:$${GID} \
 		-ti \
 		-v $${PWD}/src/ngx-dashboard:/srv/app \
-		-w /srv/app bodom0015/ng \
+		-w /srv/app node:fermium \
 			'${YARN} install --network-timeout=360000 && \
-			${NG} build --prod --deleteOutputPath=false --progress'
+			${NG} build --prod --deleteOutputPath=false --progress --no-aot --build-optimizer false'
 
 watch_dashboard:
 	docker run \
@@ -102,9 +102,9 @@ watch_dashboard:
 		-ti \
 		-v $${PWD}/src/ngx-dashboard:/srv/app \
 		-w /srv/app \
-		bodom0015/ng \
+		node:fermium \
 			'${YARN} install --network-timeout=360000 && \
-			${NG} build --prod --watch --poll 15000 --deleteOutputPath=false --progress'
+			${NG} build --prod --watch --poll 15000 --deleteOutputPath=false --progress --no-aot --build-optimizer false'
 
 restart_worker:
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -e /gwvolman
