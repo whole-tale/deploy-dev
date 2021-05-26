@@ -92,8 +92,9 @@ rebuild_dashboard:
 		-ti \
 		-e NODE_OPTIONS=--max-old-space-size=4096 \
 		-v $${PWD}/src/ngx-dashboard:/srv/app \
+		--entrypoint /bin/sh \
 		-w /srv/app node:fermium \
-			'yarn install --network-timeout=360000 && \
+			-c 'yarn install --network-timeout=360000 && \
 			./node_modules/@angular/cli/bin/ng build --prod --deleteOutputPath=false --progress --no-aot --build-optimizer false'
 
 watch_dashboard:
@@ -104,8 +105,9 @@ watch_dashboard:
 		-e NODE_OPTIONS=--max-old-space-size=4096 \
 		-v $${PWD}/src/ngx-dashboard:/srv/app \
 		-w /srv/app \
+		--entrypoint /bin/sh \
 		node:fermium \
-			'yarn install --network-timeout=360000 && \
+			-c 'yarn install --network-timeout=360000 && \
 			./node_modules/@angular/cli/bin/ng build --prod --watch --poll 15000 --deleteOutputPath=false --progress --no-aot --build-optimizer false'
 
 restart_worker:
