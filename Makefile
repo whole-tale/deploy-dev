@@ -95,7 +95,7 @@ rebuild_dashboard:
 		--entrypoint /bin/sh \
 		-w /srv/app node:fermium \
 			-c 'yarn install --network-timeout=360000 && \
-			./node_modules/@angular/cli/bin/ng build --prod --deleteOutputPath=false --progress --no-aot --build-optimizer false'
+			./node_modules/@angular/cli/bin/ng build --deleteOutputPath=false --progress'
 
 watch_dashboard:
 	docker run \
@@ -108,7 +108,7 @@ watch_dashboard:
 		--entrypoint /bin/sh \
 		node:fermium \
 			-c 'yarn install --network-timeout=360000 && \
-			./node_modules/@angular/cli/bin/ng build --prod --watch --poll 15000 --deleteOutputPath=false --progress --no-aot --build-optimizer false'
+			./node_modules/@angular/cli/bin/ng build --watch --poll 15000 --deleteOutputPath=false --progress'
 
 restart_worker:
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -e /gwvolman
