@@ -350,7 +350,7 @@ print('Create Matlab Xpra image')
 i_params = {
     'config': json.dumps({
         'command': (
-            'xpra start --bind-tcp=0.0.0.0:10000 --html=on --daemon=no --exit-with-children=no --start-after-connect="matlab -desktop"'
+            'xpra start-desktop --bind-tcp=0.0.0.0:10000 --html=on --daemon=no --exit-with-children=no --start=xfce4-session'
         ),
         'environment': [
             'VERSION=R2020b'
@@ -384,6 +384,8 @@ i_params = {
         ),
         'environment': [
             'VERSION=R2020b'
+            'MWI_BASE_URL=/matlab', 
+            'MWI_APP_PORT=8888'
         ],
         'memLimit': '2048m',
         'port': 8888,
@@ -441,7 +443,7 @@ print('Create Stata Xpra image')
 i_params = {
     'config': json.dumps({
         'command': (
-            'xpra start --bind-tcp=0.0.0.0:10000 --html=on --daemon=no --exit-with-children=no --start-after-connect=xstata'
+            'xpra start-desktop --bind-tcp=0.0.0.0:10000 --html=on --daemon=no --exit-with-children=no --start=xfce4-session'
         ),
         'environment': [
             'VERSION=16'
