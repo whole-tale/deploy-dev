@@ -108,6 +108,7 @@ settings = [
         ),
     },
     {"key": "core.cookie_domain", "value": ".local.wholetale.org"},
+    {"key": "core.secure_cookie", "value": True},
     {"key": "worker.api_url", "value": "http://girder:8080/api/v1"},
     {"key": "worker.broker", "value": "redis://redis/"},
     {"key": "worker.backend", "value": "redis://redis/"},
