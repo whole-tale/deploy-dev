@@ -5,6 +5,7 @@ role=manager,celery
 image=wholetale/gwvolman:latest
 registry_user=fido
 registry_pass=secretpass
+r2d_version=wholetale/repo2docker_wholetale:latest
 matlab_file_installation_key=secretkey
 node_id=$(docker info --format "{{.Swarm.NodeID}}")
 celery_args="-Q ${role},${node_id} --hostname=${node_id} -c 3"
@@ -23,12 +24,14 @@ docker run \
     -e HOSTDIR=/host \
     -e DEV=true \
     -e DOMAIN=${domain} \
+    -e REPO2DOCKER_VERSION="${r2d_version}" \
     -e TRAEFIK_NETWORK=wt_traefik-net \
     -e TRAEFIK_ENTRYPOINT=websecure \
     -e REGISTRY_USER=${registry_user} \
     -e REGISTRY_URL=https://registry.${domain} \
     -e REGISTRY_PASS=${registry_pass} \
     -e WT_LICENSE_PATH="$PWD"/volumes/licenses \
+    -e WT_VOLUMES_PATH="$PWD"/volumes \
     -e MATLAB_FILE_INSTALLATION_KEY=${matlab_file_installation_key} \
     -v /var/run/docker.sock:/var/run/docker.sock:ro \
     -v /:/host \
