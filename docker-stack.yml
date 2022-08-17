@@ -127,7 +127,6 @@ services:
     image: registry:2.6
     networks:
       - traefik-net
-      - celery
     volumes:
       - ./registry:/var/lib/registry
       - ./registry/auth:/auth:ro
@@ -150,7 +149,6 @@ services:
     image: registry:2.6
     networks:
       - traefik-net
-      - celery
     volumes:
       - ./registry:/var/lib/registry:ro
     deploy:
