@@ -33,7 +33,6 @@ services:
       labels:
         - "traefik.enable=false"
 
-
   girder:
     image: wholetale/girder:latest
     networks:
@@ -128,7 +127,6 @@ services:
     image: registry:2.6
     networks:
       - traefik-net
-      - celery
     volumes:
       - ./registry:/var/lib/registry
       - ./registry/auth:/auth:ro
@@ -145,6 +143,24 @@ services:
         - "traefik.http.routers.registry.tls=true"
         - "traefik.http.services.registry.loadbalancer.server.port=5000"
         - "traefik.http.services.registry.loadbalancer.passhostheader=true"
+        - "traefik.docker.network=wt_traefik-net"
+
+  images:
+    image: registry:2.6
+    networks:
+      - traefik-net
+    volumes:
+      - ./registry:/var/lib/registry:ro
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.images.rule=Host(`images.local.wholetale.org`)"
+        - "traefik.http.routers.images.rule=Method(`GET`)"
+        - "traefik.http.routers.images.entrypoints=websecure"
+        - "traefik.http.routers.images.tls=true"
+        - "traefik.http.services.images.loadbalancer.server.port=5000"
+        - "traefik.http.services.images.loadbalancer.passhostheader=true"
         - "traefik.docker.network=wt_traefik-net"
 
 #  celery_worker:
