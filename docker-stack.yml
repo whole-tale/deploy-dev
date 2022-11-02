@@ -50,12 +50,15 @@ services:
       - ./src/virtual_resources:/girder/plugins/virtual_resources
       - ./src/gwvolman:/gwvolman
       - ./src/girderfs:/girderfs
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp:/tmp
     environment:
       - DOMAIN=local.wholetale.org
       - DASHBOARD_URL=https://dashboard.local.wholetale.org
-      - GOSU_USER=girder:girder
+      - GOSU_USER=girder:girder:999
       - "GOSU_CHOWN=/tmp/data"
       - DATAONE_URL=https://cn-stage-2.test.dataone.org/cn
+      - HOSTDIR=/
     deploy:
       replicas: 1
       labels:
@@ -71,6 +74,17 @@ services:
         - "traefik.docker.network=wt_traefik-net"
         - "traefik.http.middlewares.girder.forwardauth.address=http://girder:8080/api/v1/instance/authorize/"
         - "traefik.http.middlewares.girder.forwardauth.trustforwardheader=true"
+
+  logger:
+    image: wholetale/instance_logger:latest
+    networks:
+      - celery
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=false"
 
   redis:
     image: redis:4-stretch
