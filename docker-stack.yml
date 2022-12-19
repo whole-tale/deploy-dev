@@ -55,7 +55,7 @@ services:
     environment:
       - DOMAIN=local.wholetale.org
       - DASHBOARD_URL=https://dashboard.local.wholetale.org
-      - GOSU_USER=girder:girder:999
+      - GOSU_USER=girder:girder:${DOCKER_GID:-999}
       - "GOSU_CHOWN=/tmp/data"
       - DATAONE_URL=https://cn-stage-2.test.dataone.org/cn
       - HOSTDIR=/
