@@ -136,6 +136,11 @@ clean:
 	  sleep 2 ; \
 	  limit="$$((limit-1))" ; \
 	done; true
+	for dir in volumes/mountpoints/* ; do \
+	  for subdir in $$dir/* ; do \
+	    sudo umount -lf $$subdir || true ; \
+	  done \
+	done; true
 	for dir in ps workspaces homes base versions runs mountpoints ; do \
 	  sudo rm -rf volumes/$$dir ; \
 	done; true
