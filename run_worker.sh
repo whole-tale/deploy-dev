@@ -2,7 +2,7 @@
 
 domain=local.wholetale.org
 role=manager,celery
-image=wholetale/gwvolman:jail
+image=wholetale/gwvolman:latest
 registry_user=fido
 registry_pass=secretpass
 r2d_version=wholetale/repo2docker_wholetale:latest
