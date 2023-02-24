@@ -2,7 +2,7 @@
 	rebuild_dashboard watch_dashboard \
 	restart_worker restart_girder globus_handler_src status update_src
 
-SUBDIRS = src volumes/ps volumes/workspaces volumes/homes volumes/base volumes/versions volumes/runs volumes/licenses
+SUBDIRS = src volumes/ps volumes/workspaces volumes/homes volumes/base volumes/versions volumes/runs volumes/licenses volumes/mountpoints
 TAG = latest
 MEM_LIMIT = 2048
 NODE = node --max_old_space_size=${MEM_LIMIT}
@@ -136,7 +136,12 @@ clean:
 	  sleep 2 ; \
 	  limit="$$((limit-1))" ; \
 	done; true
-	for dir in ps workspaces homes base versions runs ; do \
+	for dir in volumes/mountpoints/* ; do \
+	  for subdir in $$dir/* ; do \
+	    sudo umount -lf $$subdir || true ; \
+	  done \
+	done; true
+	for dir in ps workspaces homes base versions runs mountpoints ; do \
 	  sudo rm -rf volumes/$$dir ; \
 	done; true
 	-docker volume rm wt_mongo-cfg wt_mongo-data
