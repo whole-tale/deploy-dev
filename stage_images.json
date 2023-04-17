@@ -84,7 +84,6 @@
       "port": 8888,
       "targetMount": "/home/jovyan/work",
       "urlPath": "lab?token={token}",
-      "urlpath": "lab?token={token}",
       "user": "jovyan"
     },
     "description": null,

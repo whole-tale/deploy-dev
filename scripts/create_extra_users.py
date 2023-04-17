@@ -3,7 +3,7 @@ from requests.auth import HTTPBasicAuth
 
 users = [
     {
-        "firstName": "Alicja",
+        "firstName": "Editor",
         "lastName": "Smith",
         "login": "ala123",
         "email": "ala@localhost.com",
@@ -11,10 +11,18 @@ users = [
         "password": "password",
     },
     {
-        "firstName": "Barbara",
-        "lastName": "Smith",
+        "firstName": "Author",
+        "lastName": "Miller",
         "login": "basia",
         "email": "basia@localhost.com",
+        "admin": False,
+        "password": "password",
+    },
+    {
+        "firstName": "Verifier",
+        "lastName": "Jones",
+        "login": "verifier",
+        "email": "verirfier@localhost.com",
         "admin": False,
         "password": "password",
     },
@@ -42,3 +50,4 @@ for user in users:
 
     token = r.json()["authToken"]["token"]
     print(f"https://dashboard.local.wholetale.org/login?token={token} # {user['login']}")
+    print(f"{user['login']} {token}")

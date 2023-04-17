@@ -137,6 +137,27 @@
       "buildpack": "RockerBuildPack",
       "command": "/start.sh",
       "environment": [
+        "WT_ROCKER_VER=4.2",
+        "WT_RSTUDIO_URL=https://github.com/whole-tale/rstudio/releases/download/v1.4.1106-wt/rstudio-server-1.4.1106-bionic-amd64.deb",
+        "WT_RSTUDIO_MD5=1d2bbd588f9a3ac00580939d4812a7d1",
+        "PASSWORD=R994ULxH-YYQz^mH"
+      ],
+      "memLimit": "8196m",
+      "port": 8787,
+      "targetMount": "/WholeTale",
+      "urlPath": "",
+      "user": "rstudio"
+    },
+    "icon": "https://www.rstudio.com/wp-content/uploads/2014/06/RStudio-Ball.png",
+    "iframe": true,
+    "name": "RStudio (R 4.2)",
+    "public": true
+  },
+  {
+    "config": {
+      "buildpack": "RockerBuildPack",
+      "command": "/start.sh",
+      "environment": [
         "PASSWORD=djkslajdklasjdklsajd"
       ],
       "memLimit": "2048m",
