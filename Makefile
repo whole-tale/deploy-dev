@@ -57,8 +57,7 @@ $(SUBDIRS):
 services: dirs sources
 
 dev: services
-	docker stack deploy --compose-file=docker-stack.yml wt
-	./run_worker.sh
+	. ./.env && docker stack config --compose-file docker-stack.yml | docker stack deploy --compose-file - wt
 	cid=$$(docker ps --filter=name=wt_girder -q);
 	while [ -z $${cid} ] ; do \
 		  echo $${cid} ; \
@@ -112,7 +111,7 @@ watch_dashboard:
 
 restart_worker:
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -e /gwvolman
-	./stop_worker.sh && ./run_worker.sh
+	docker kill $$(docker ps --filter=name=wt_celery_worker -q)
 
 tail_girder_err:
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
@@ -123,7 +122,6 @@ reset_girder:
 		python3 -c 'from girder.models import getDbConnection;getDbConnection().drop_database("girder")'
 
 clean:
-	-./stop_worker.sh
 	-./destroy_instances.py
 	-docker stack rm wt
 	limit=15 ; \
