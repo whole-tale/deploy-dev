@@ -42,8 +42,6 @@ services:
     volumes:
       - ./volumes:/tmp/data
       - ./girder/girder.local.cfg:/girder/girder/conf/girder.local.cfg
-      - ./src/sem_viewer:/girder/plugins/sem_viewer
-      - ./src/table_view:/girder/plugins/table_view
       - ./src/wholetale:/girder/plugins/wholetale
       - ./src/wt_data_manager:/girder/plugins/wt_data_manager
       - ./src/wt_home_dir:/girder/plugins/wt_home_dir
