@@ -190,6 +190,7 @@ services:
       - DOMAIN=${domain}
       - DEV=true
       - REPO2DOCKER_VERSION=${r2d_version}
+      - GIRDERFS_IMAGE=${girderfs_image}
       - TRAEFIK_NETWORK=wt_traefik-net
       - TRAEFIK_ENTRYPOINT=websecure
       - REGISTRY_USER=${registry_user}
