@@ -111,7 +111,7 @@ watch_dashboard:
 
 restart_worker:
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -e /gwvolman
-	docker kill $$(docker ps --filter=name=wt_celery_worker -q)
+	docker service update --force --image=$$(docker service inspect wt_celery_worker --format={{.Spec.TaskTemplate.ContainerSpec.Image}}) wt_celery_worker
 
 tail_girder_err:
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) \
