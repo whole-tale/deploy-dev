@@ -6,8 +6,8 @@ This directory contains scripts required to run a full instance of the Whole Tal
 
 System requirements
 -------------------
- * Linux (tested on Ubuntu 18.04, CoreOS; not working on MacOS _yet_)
- * docker 17.04.0+, swarm mode
+ * Linux (tested on Ubuntu 18.04 - 22.04)
+ * docker 17.04.0+, swarm mode (23.0.5 recommended)
  * python, requests
  * jq
  * make
@@ -16,6 +16,28 @@ System requirements
  * Default user with uid:1000 and gid:100
  * On Ubuntu, `apt-get install davfs2 fuse libfuse-dev`
   
+Installing (Ubuntu)
+-------------------
+This assumes a standard JS2 Ubuntu 22.04 cloud instance.
+
+Install required packages:
+```
+sudo apt-get update -y 
+sudo apt-get -y install python-is-python3 python3-pip jq make davfs2 fuse libfuse-dev
+```
+
+Install Docker https://docs.docker.com/engine/install/ubuntu/).
+
+Add `ubuntu` user to `docker` group:
+```
+sudo usermod -G docker ubuntu
+```
+
+Initialize your system for Swarm:
+```
+docker swarm init
+```
+
  
 Deployment process
 ------------------
@@ -29,10 +51,6 @@ The deployment process does the following:
     * **WARNING:** During `celery_worker`'s initialization host's `/usr/local` directory is overshadowed by the content of `/usr/local` from the container. 
 * Runs `setup_girder.py` to initialize the instance
 
-If you haven't already, initialize your system as a swarm master:
-```
-docker swarm init
-```
 
 Add default user (1000) and group (100), if not present:
 ```
@@ -91,16 +109,16 @@ $ docker ps | grep celery_worker
 0e8124024f03        wholetale/gwvolman:latest                                "python3 -m girder_w…"   15 hours ago        Up 15 hours                             celery_worker
 ```
 
-Note: If you're running in a VM, you'll need to setup  forwarding for port 443 (requires `sudo`):
+Note: If you're running on a VM, you'll need to setup  forwarding for port 443 (requires `sudo`):
 ```
-$ sudo ssh -L 443:localhost:443 user@VM
+$ sudo ssh -L 443:localhost:443 user@IP
 ```
 
 You should now be able to open a browser to https://dashboard.local.wholetale.org to access your running instance of Whole Tale.
 
 Modifications
 ---------
-Anytime you modify `docker-stack.yml`, you will need to run `make dev` to see those changes reflected in Docker.
+Anytime you modify `docker-stack.yml`, you will need to run `make dev` or use `docker stack` commands directly to see those changes reflected in Docker.
 
 ### Development Modifications
 If you plan to modify and rebuild the dashboard code, you can follow these steps:
