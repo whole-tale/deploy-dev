@@ -51,7 +51,7 @@ r = requests.post(
     params={
         "type": 0,
         "name": "Base",
-        "root": "/tmp/data/base",
+        "root": "/srv/data/base",
     },
 )
 
@@ -68,6 +68,12 @@ plugins = [
     "wt_home_dir",
     "wt_versioning",
 ]
+if os.environ.get("DATACAT"):
+    plugins += [
+        "sem_viewer",
+        "table_view",
+        "synced_folders",
+    ]
 r = requests.put(
     api_url + "/system/plugins",
     headers=headers,
@@ -132,12 +138,18 @@ settings = [
         "key": "wholetale.zenodo_extra_hosts",
         "value": ["https://sandbox.zenodo.org/record/"]
     },
-    {"key": "dm.private_storage_path", "value": "/tmp/data/ps"},
-    {"key": "wthome.homedir_root", "value": "/tmp/data/homes"},
-    {"key": "wthome.taledir_root", "value": "/tmp/data/workspaces"},
-    {"key": "wtversioning.runs_root", "value": "/tmp/data/runs"},
-    {"key": "wtversioning.versions_root", "value": "/tmp/data/versions"},
+    {"key": "dm.private_storage_path", "value": "/srv/data/ps"},
+    {"key": "wthome.homedir_root", "value": "/srv/data/homes"},
+    {"key": "wthome.taledir_root", "value": "/srv/data/workspaces"},
+    {"key": "wtversioning.runs_root", "value": "/srv/data/runs"},
+    {"key": "wtversioning.versions_root", "value": "/srv/data/versions"},
 ]
+if os.environ.get("DATACAT"):
+    settings += [
+        {"key": "wholetale.dashboard_link_title", "value": "Tale Dashboard"},
+        {"key": "wholetale.catalog_link_title", "value": "Data Catalog"},
+        {"key": "wholetale.enable_data_catalog", "value": True},
+    ]
 
 r = requests.put(
     api_url + "/system/setting", headers=headers, params={"list": json.dumps(settings)}

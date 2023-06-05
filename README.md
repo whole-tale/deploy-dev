@@ -91,6 +91,14 @@ Run:
 make dev
 ```
 
+or
+
+```
+DATACAT=1 make dev
+```
+
+for WholeTale flavor operating on local data.
+
 To confirm things are working, all `REPLICAS` should show `1/1`
 ```
 $ docker service ls
