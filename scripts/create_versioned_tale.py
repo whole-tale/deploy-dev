@@ -88,7 +88,7 @@ tale = {
         }
     ],
     "category": "science",
-    "config": {},
+    "config": {"some_key": "some_value"},
     "dataSet": dataset,
     "description": "Something something...",
     "imageId": image["_id"],
@@ -126,7 +126,6 @@ image = requests.get(api_url + "/image", params={"text": '"Matlab"'}).json()[
 tale.update({
     "category": "rocket science",
     "config": {"foo": "bar"},
-    "dataSet": [],
     "description": "A better description",
     "imageId": image["_id"],
     "title": "New better title",

@@ -4,9 +4,17 @@ services:
   traefik:
     image: traefik:v2.4
     ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
+      - target: 8080
+        published: 8080
+        protocol: tcp
     networks:
       - traefik-net
     volumes:
@@ -17,9 +25,16 @@ services:
       replicas: 1
       labels:
         - "traefik.enable=false"
+      placement:
+        constraints:
+          - "node.role == manager"
     environment:
       - GODADDY_API_KEY=$WT_GODADDY_API_KEY
       - GODADDY_API_SECRET=$WT_GODADDY_API_SECRET
+    command:
+      - "--accesslog=true"
+      - "--accesslog.format=json"
+      - "--accesslog.filepath=/dev/stdout"
 
   minio:
     image: minio/minio
@@ -61,7 +76,7 @@ services:
         - "traefik.enable=false"
 
   girder:
-    image: wholetale/girder:latest
+    image: wholetale/girder:approval
     networks:
       - traefik-net
       - celery
@@ -69,24 +84,31 @@ services:
     volumes:
       - ./volumes:/srv/data
       - ./girder/girder.local.cfg:/girder/girder/conf/girder.local.cfg
+      - ./workspace.yaml:/girder/workspace.yaml
       - ./src/wholetale:/girder/plugins/wholetale
+      - ./src/minio_assetstore:/girder/plugins/minio_assetstore
       - ./src/synced_folders:/girder/plugins/synced_folders
       - ./src/sem_viewer:/girder/plugins/sem_viewer
+      - ./src/table_view:/girder/plugins/table_view
+      - ./src/item_previews:/girder/plugins/item_previews
       - ./src/wt_data_manager:/girder/plugins/wt_data_manager
       - ./src/wt_home_dir:/girder/plugins/wt_home_dir
       - ./src/wt_versioning:/girder/plugins/wt_versioning
       - ./src/globus_handler:/girder/plugins/globus_handler
       - ./src/virtual_resources:/girder/plugins/virtual_resources
+      - ./src/dataflows:/girder/plugins/dataflows
       - ./src/gwvolman:/gwvolman
       - ./src/girderfs:/girderfs
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp:/tmp
+      - /home/xarth/codes/htmdec:/home/xarth/codes/htmdec
     environment:
       - DOMAIN=${domain}
       - DASHBOARD_URL=https://dashboard.${domain}
       - GOSU_USER=girder:girder:${docker_group}
       - GOSU_CHOWN=/srv/data
       - DATAONE_URL=https://cn-stage-2.test.dataone.org/cn
+      - GIRDER_LOCAL_FONTELLO_ARCHIVE=/girder/clients/web/static/built/fontello.zip
       - HOSTDIR=/
     extra_hosts:
       - "images.${domain}:host-gateway"
@@ -246,12 +268,76 @@ services:
         - "traefik.enable=true"
     command: -c 3
 
+  postgresql:
+    image: postgres:11
+    networks:
+      - dagster
+    environment:
+      - POSTGRES_USER=postgres_user
+      - POSTGRES_PASSWORD=postgres_password
+      - POSTGRES_DB=postgres_db
+
+  dagster_web:
+    image: xarthisius/dagster:latest
+    depends_on:
+      - postgresql
+    entrypoint: ["dagster-webserver", "-h", "0.0.0.0", "-p", "3000", "-w", "workspace.yaml"]
+    networks:
+      - traefik-net
+      - dagster
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.dagster.rule=Host(`dagster.${domain}`)"
+        - "traefik.http.routers.dagster.entrypoints=websecure"
+        - "traefik.http.routers.dagster.tls=true"
+        - "traefik.http.services.dagster.loadbalancer.server.port=3000"
+        - "traefik.http.services.dagster.loadbalancer.passhostheader=true"
+        - "traefik.docker.network=wt_traefik-net"
+    environment:
+      - DAGSTER_POSTGRES_USER=postgres_user
+      - DAGSTER_POSTGRES_PASSWORD=postgres_password
+      - DAGSTER_POSTGRES_DB=postgres_db
+    extra_hosts:
+      - "girder.${domain}:host-gateway"
+    volumes:
+      - ./workspace.yaml:/opt/dagster/dagster_home/workspace.yaml
+      - ./dagster.yaml:/opt/dagster/dagster_home/dagster.yaml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./volumes/io_manager_storage:/tmp/io_manager_storage
+
+  dagster_daemon:
+    image: xarthisius/dagster:latest
+    entrypoint: ["dagster-daemon", "run"]
+    environment:
+      - DAGSTER_POSTGRES_USER=postgres_user
+      - DAGSTER_POSTGRES_PASSWORD=postgres_password
+      - DAGSTER_POSTGRES_DB=postgres_db
+    volumes:
+      - ./workspace.yaml:/opt/dagster/dagster_home/workspace.yaml
+      - ./dagster.yaml:/opt/dagster/dagster_home/dagster.yaml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./volumes/io_manager_storage:/tmp/io_manager_storage
+    extra_hosts:
+      - "girder.${domain}:host-gateway"
+    networks:
+      - dagster
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=false"
+
+
 networks:
   traefik-net:
     driver: overlay
   mongo:
     driver: overlay
   celery:
+    driver: overlay
+    attachable: true
+  dagster:
     driver: overlay
     attachable: true
 

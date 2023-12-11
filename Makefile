@@ -74,6 +74,7 @@ dev: services
 	    cid=$$(docker ps --filter=name=wt_girder -q) ; \
 	done; \
 	true
+	docker cp ./fontello.zip $$(docker ps --filter=name=wt_girder -q):/girder/clients/web/static/built/
 	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install plugin \
 		plugins/wt_data_manager \
 		plugins/wholetale \
@@ -81,10 +82,12 @@ dev: services
 		plugins/globus_handler \
 		plugins/virtual_resources \
 		plugins/wt_versioning \
+		plugins/minio_assetstore \
 		plugins/sem_viewer \
+		plugins/dataflows \
 		plugins/table_view \
 		plugins/synced_folders
-	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir,globus_handler,sem_viewer,table_view,synced_folders
+	docker exec -ti $$(docker ps --filter=name=wt_girder -q) girder-install web --dev --plugins=oauth,gravatar,jobs,worker,wt_data_manager,wholetale,wt_home_dir,globus_handler,sem_viewer,table_view,synced_folders,minio_assetstore,dataflows
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -r /gwvolman/requirements.txt -e /gwvolman
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) pip install -e /girderfs
 	./setup_girder.py

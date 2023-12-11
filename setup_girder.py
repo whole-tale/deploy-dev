@@ -70,9 +70,11 @@ plugins = [
 ]
 if os.environ.get("DATACAT"):
     plugins += [
-        "sem_viewer",
         "table_view",
         "synced_folders",
+        "dataflows",
+        "sem_viewer",
+        "minio_assetstore",
     ]
 r = requests.put(
     api_url + "/system/plugins",
@@ -132,7 +134,7 @@ settings = [
     {"key": "dm.globus_gc_dir", "value": "/opt/globusconnectpersonal"},
     {
         "key": "wholetale.dataverse_extra_hosts",
-        "value": ["dev2.dataverse.org", "demo.dataverse.org"],
+        "value": ["demo.dataverse.org"],
     },
     {
         "key": "wholetale.zenodo_extra_hosts",
@@ -149,6 +151,7 @@ if os.environ.get("DATACAT"):
         {"key": "wholetale.dashboard_link_title", "value": "Tale Dashboard"},
         {"key": "wholetale.catalog_link_title", "value": "Data Catalog"},
         {"key": "wholetale.enable_data_catalog", "value": True},
+        {"key": "core.registration_policy", "value": "approve"},
     ]
 
 r = requests.put(
