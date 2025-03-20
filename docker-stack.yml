@@ -36,32 +36,33 @@ services:
       - "--accesslog.format=json"
       - "--accesslog.filepath=/dev/stdout"
 
-        #  minio:
-        #    image: minio/minio
-        #    env_file: ./minio.env
-        #    ports:
-        #      - 9000:9000
-        #    volumes:
-        #      - ./volumes/minio:/data
-        #    networks:
-        #      - traefik-net
-        #    command: minio server /data --console-address ":9001"
-        #    deploy:
-        #      labels:
-        #        - "traefik.enable=true"
-        #        - "traefik.docker.network=wt_traefik-net"
-        #        - "traefik.http.routers.minio.rule=Host(`minio.${domain}`)"
-        #        - "traefik.http.routers.minio.entrypoints=websecure"
-        #        - "traefik.http.routers.minio.tls=true"
-        #        - "traefik.http.routers.minio.service=minio"
-        #        - "traefik.http.services.minio.loadbalancer.server.port=9000"
-        #        - "traefik.http.services.minio.loadbalancer.passhostheader=true"
-        #        - "traefik.http.routers.minio-console.rule=Host(`minio-console.${domain}`)"
-        #        - "traefik.http.routers.minio-console.entrypoints=websecure"
-        #        - "traefik.http.routers.minio-console.tls=true"
-        #        - "traefik.http.routers.minio-console.service=minio-console"
-        #        - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
-        #        - "traefik.http.services.minio-console.loadbalancer.passhostheader=true"
+  minio:
+    image: minio/minio
+    env_file: ./minio.env
+    ports:
+      - 9000:9000
+    volumes:
+      - ./volumes/minio:/data
+    networks:
+      - traefik-net
+    command: minio server /data --console-address ":9001"
+    deploy:
+      replicas: 0
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=wt_traefik-net"
+        - "traefik.http.routers.minio.rule=Host(`minio.${domain}`)"
+        - "traefik.http.routers.minio.entrypoints=websecure"
+        - "traefik.http.routers.minio.tls=true"
+        - "traefik.http.routers.minio.service=minio"
+        - "traefik.http.services.minio.loadbalancer.server.port=9000"
+        - "traefik.http.services.minio.loadbalancer.passhostheader=true"
+        - "traefik.http.routers.minio-console.rule=Host(`minio-console.${domain}`)"
+        - "traefik.http.routers.minio-console.entrypoints=websecure"
+        - "traefik.http.routers.minio-console.tls=true"
+        - "traefik.http.routers.minio-console.service=minio-console"
+        - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
+        - "traefik.http.services.minio-console.loadbalancer.passhostheader=true"
 
   mongo:
     image: mongo:4.4
@@ -77,6 +78,7 @@ services:
 
   girder:
     image: xarthisius/girder:5-dev
+      # image: xarthisius/girder:test
     networks:
       - traefik-net
       - celery
@@ -84,15 +86,16 @@ services:
     volumes:
       - ./volumes:/srv/data
       - ./workspace.yaml:/girder/workspace.yaml
-      - ./src/girder-wholetale:/girder-plugins/02-girder-wholetale
       - ./src/girder-virtual-resources:/girder-plugins/01-girder-virtual-resources
+      - ./src/girder-wholetale:/girder-plugins/02-girder-wholetale
+      - /home/xarth/codes/htmdec/sem_viewer:/girder-plugins/03-girder-sem-viewer
+      - /home/xarth/codes/htmdec/girder-sample-tracker:/girder-plugins/04-girder-sample-tracker
+      - /home/xarth/codes/wholetale-ng/girder-jsonforms:/girder-plugins/05-girder-jsonforms
+      - /home/xarth/codes/xarthisius/girder-dataflows:/girder-plugins/06-girder-dataflows
+      - /home/xarth/codes/htmdec/table_view:/girder-plugins/07-girder-table-view
      # - ./src/minio_assetstore:/girder/plugins/minio_assetstore
      # - ./src/synced_folders:/girder/plugins/synced_folders
-     # - ./src/sem_viewer:/girder/plugins/sem_viewer
-     # - ./src/table_view:/girder/plugins/table_view
      # - ./src/item_previews:/girder/plugins/item_previews
-     # - ./src/dataflows:/girder/plugins/dataflows
-     # - ./src/sample_tracker:/girder/plugins/sample_tracker
       - ./src/gwvolman:/gwvolman
       - ./src/girderfs:/girderfs
       - /var/run/docker.sock:/var/run/docker.sock
@@ -102,6 +105,8 @@ services:
       - DASHBOARD_URL=https://dashboard.${domain}
       - GIRDER_MONGO_URI=mongodb://mongo:27017/girder
       - GIRDER_HOST=0.0.0.0
+      - GIRDER_WORKER_BROKER=redis://redis/
+      - GIRDER_WORKER_BACKEND=redis://redis/
       - GOSU_USER=1001:1001:${docker_group}
       - GOSU_CHOWN=/srv/data
       - DATAONE_URL=https://cn-stage-2.test.dataone.org/cn
@@ -163,7 +168,7 @@ services:
         - "traefik.http.routers.dashboard.rule=Host(`dashboard.${domain}`)"
         - "traefik.http.routers.dashboard.entrypoints=websecure"
         - "traefik.http.routers.dashboard.tls=true"
-        - "traefik.http.services.dashboard.loadbalancer.server.port=80"
+        - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
         - "traefik.http.services.dashboard.loadbalancer.passhostheader=true"
         - "traefik.docker.network=wt_traefik-net"
     volumes:
@@ -217,7 +222,7 @@ services:
     volumes:
       - ./registry:/var/lib/registry:ro
     deploy:
-      replicas: 1
+      replicas: 0
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.images.rule=Host(`images.${domain}`)"
@@ -249,6 +254,7 @@ services:
       - WT_VOLUMES_PATH=${PWD}/volumes
       - MATLAB_FILE_INSTALLATION_KEY=${matlab_file_installation_key}
       - SWARM_NODE_ID={{.Node.ID}}
+      - BUILDER_URL=https://builder.${domain}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./volumes/tmp:/tmp
@@ -263,6 +269,7 @@ services:
       - "registry.${domain}:host-gateway"
       - "images.${domain}:host-gateway"
       - "girder.${domain}:host-gateway"
+      - "builder.${domain}:host-gateway"
     deploy:
       mode: global
       labels:
@@ -271,6 +278,8 @@ services:
 
   postgresql:
     image: postgres:11
+    deploy:
+      replicas: 0
     networks:
       - dagster
     environment:
@@ -287,7 +296,7 @@ services:
       - traefik-net
       - dagster
     deploy:
-      replicas: 1
+      replicas: 0
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.dagster.rule=Host(`dagster.${domain}`)"
@@ -325,10 +334,33 @@ services:
     networks:
       - dagster
     deploy:
-      replicas: 1
+      replicas: 0
       labels:
         - "traefik.enable=false"
-
+  
+  remote_builder:
+    image: xarthisius/remote_builder:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik-net
+    environment:
+      - WEB_CONCURRENCY=2
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.builder.rule=Host(`builder.${domain}`)"
+        - "traefik.http.routers.builder.entrypoints=websecure"
+        - "traefik.http.routers.builder.tls=true"
+        - "traefik.http.services.builder.loadbalancer.server.port=8000"
+        - "traefik.http.services.builder.loadbalancer.passhostheader=true"
+        - "traefik.docker.network=wt_traefik-net"
+    extra_hosts:
+      - "images.${domain}:host-gateway"
+      - "registry.${domain}:host-gateway"
+      - "girder.${domain}:host-gateway"
+      - "builder.${domain}:host-gateway"
 
 networks:
   traefik-net:

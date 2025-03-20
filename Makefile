@@ -104,6 +104,8 @@ rebuild_dashboard:
 		-w /srv/app node:fermium \
 			-c 'yarn install --network-timeout=360000 && \
 			./node_modules/@angular/cli/bin/ng build --deleteOutputPath=false --progress'
+	sudo touch src/ngx-dashboard/dist/browser/assets/env.js
+	sudo chown 101:101 src/ngx-dashboard/dist/browser/assets/env.js
 
 watch_dashboard:
 	docker run \
@@ -152,6 +154,7 @@ clean:
 	  sudo rm -rf volumes/$$dir ; \
 	done; true
 	-docker volume rm wt_mongo-cfg wt_mongo-data
+	rm -rf traefik/certs || true
 
 status:
 	@-./scripts/git_status.sh

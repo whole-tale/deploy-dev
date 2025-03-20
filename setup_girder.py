@@ -16,11 +16,13 @@ params = {
 headers = {"Content-Type": "application/json", "Accept": "application/json"}
 domain = os.environ.get("domain", "local.xarthisius.xyz")
 
+
 def final_msg():
     print("-------------- You should be all set!! -------------")
     print(f"try going to https://girder.{domain} and log in with: ")
     print("  user : %s" % params["login"])
     print("  pass : %s" % params["password"])
+
 
 api_url = f"https://girder.{domain}/api/v1"
 
@@ -69,26 +71,23 @@ settings = [
             "X-Forwarded-Host, Remote-Addr, Cache-Control"
         ),
     },
-    # {"key": "core.cookie_domain", "value": f".{domain}"},
-    {"key": "worker.api_url", "value": "http://girder:8080/api/v1"},
-    {"key": "worker.broker", "value": "redis://redis/"},
-    {"key": "worker.backend", "value": "redis://redis/"},
+    {"key": "core.cookie_domain", "value": f".{domain}"},
     {"key": "oauth.globus_client_id", "value": os.environ.get("GLOBUS_CLIENT_ID")},
     {
         "key": "oauth.globus_client_secret",
         "value": os.environ.get("GLOBUS_CLIENT_SECRET"),
     },
-    #{"key": "oauth.orcid_client_id", "value": os.environ.get("ORCID_CLIENT_ID")},
-    #{
-    #    "key": "oauth.orcid_client_secret",
-    #    "value": os.environ.get("ORCID_CLIENT_SECRET"),
-    #},
+    {"key": "oauth.orcid_client_id", "value": os.environ.get("ORCID_CLIENT_ID")},
+    {
+        "key": "oauth.orcid_client_secret",
+        "value": os.environ.get("ORCID_CLIENT_SECRET"),
+    },
     {"key": "oauth.providers_enabled", "value": ["globus"]},
     # {"key": "dm.globus_gc_dir", "value": "/opt/globusconnectpersonal"},
-    #{
+    # {
     #    "key": "wholetale.zenodo_extra_hosts",
     #    "value": ["https://sandbox.zenodo.org/record/"]
-    #},
+    # },
     {"key": "dm.private_storage_path", "value": "/srv/data/ps"},
     {"key": "wholetale.homes_root", "value": "/srv/data/homes"},
     {"key": "wholetale.workspaces_root", "value": "/srv/data/workspaces"},
@@ -119,7 +118,7 @@ for image in images:
     r = requests.post(api_url + "/image", headers=headers, params=image)
     r.raise_for_status()
 
-#print("Restarting girder to update WebDav roots")
-#r = requests.put(api_url + "/system/restart", headers=headers)
-#r.raise_for_status()
+# print("Restarting girder to update WebDav roots")
+# r = requests.put(api_url + "/system/restart", headers=headers)
+# r.raise_for_status()
 final_msg()
