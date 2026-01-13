@@ -12,13 +12,11 @@
 
 [providers]
   providersThrottleDuration = "2s"
-  [providers.docker]
+  [providers.swarm]
     watch = true
     endpoint = "unix:///var/run/docker.sock"
     exposedByDefault = true
-    swarmMode = true
-    swarmModeRefreshSeconds = "15s"
-    httpClientTimeout = "0s"
+    refreshSeconds = "15s"
     # defaultRule = Host(`{{ trimPrefix `/` .Name }}.{{ env "DOMAIN" }}`)
   [providers.file]
     directory="/etc/traefik/dynamic"
@@ -42,7 +40,7 @@
   insecure = true
 
 [log]
-  level = "DEBUG"
+  level = "INFO"
 
 [accessLog]
   format = "json"

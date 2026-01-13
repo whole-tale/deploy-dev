@@ -60,7 +60,7 @@ print("Setting up Plugin")
 settings = [
     {
         "key": "core.cors.allow_origin",
-        "value": f"https://dashboard.{domain},http://localhost:4200,https://legacy.{domain}",
+        "value": f"https://dashboard.{domain},http://localhost:4200,http://localhost:5173",
     },
     {
         "key": "core.cors.allow_headers",
