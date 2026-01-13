@@ -15,7 +15,7 @@ if [ ! -f $1 ]; then
 fi
 
 # copy dump file to container
-docker cp $1 $(docker ps --filter=name=wt_mongo -q):/tmp
+docker cp $1 $(docker ps --filter=name=wt_mongo.1 -q):/tmp
 
 # Restore the dump from /tmp
-docker exec -i $(docker ps --filter=name=wt_mongo -q) mongorestore --gzip --drop --archive=/tmp/$1
+docker exec -i $(docker ps --filter=name=wt_mongo.1 -q) mongorestore --gzip --drop --archive=/tmp/$(basename $1)
