@@ -36,33 +36,30 @@ services:
       - "--accesslog.format=json"
       - "--accesslog.filepath=/dev/stdout"
 
-  minio:
-    image: minio/minio
-    env_file: ./minio.env
-    ports:
-      - 9000:9000
-    volumes:
-      - ./volumes/minio:/data
+  projects:
+    image: node:22-bookworm
     networks:
       - traefik-net
-    command: minio server /data --console-address ":9001"
+    volumes:
+      - /home/xarth/codes/hemi-ncsa-dt/aimdl-projects:/srv
     deploy:
-      replicas: 0
+      replicas: 1
       labels:
         - "traefik.enable=true"
+        - "traefik.http.routers.projects.rule=Host(`projects.${domain}`)"
+        - "traefik.http.routers.projects.entrypoints=websecure"
+        - "traefik.http.routers.projects.tls=true"
+        - "traefik.http.services.projects.loadbalancer.server.port=5173"
+        - "traefik.http.services.projects.loadbalancer.passhostheader=true"
         - "traefik.docker.network=wt_traefik-net"
-        - "traefik.http.routers.minio.rule=Host(`minio.${domain}`)"
-        - "traefik.http.routers.minio.entrypoints=websecure"
-        - "traefik.http.routers.minio.tls=true"
-        - "traefik.http.routers.minio.service=minio"
-        - "traefik.http.services.minio.loadbalancer.server.port=9000"
-        - "traefik.http.services.minio.loadbalancer.passhostheader=true"
-        - "traefik.http.routers.minio-console.rule=Host(`minio-console.${domain}`)"
-        - "traefik.http.routers.minio-console.entrypoints=websecure"
-        - "traefik.http.routers.minio-console.tls=true"
-        - "traefik.http.routers.minio-console.service=minio-console"
-        - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
-        - "traefik.http.services.minio-console.loadbalancer.passhostheader=true"
+    working_dir: /srv
+    extra_hosts:
+      - "girder.${domain}:host-gateway"
+    command:
+      - "npm"
+      - "run"
+      - "dev"
+      - "--host"
 
   mongo:
     image: mongo:4.4
@@ -76,45 +73,97 @@ services:
       labels:
         - "traefik.enable=false"
 
-  girder:
+  local_worker:
     image: xarthisius/girder:5-dev
-      # image: xarthisius/girder:test
     networks:
-      - traefik-net
       - celery
       - mongo
     volumes:
       - ./volumes:/srv/data
       - ./workspace.yaml:/girder/workspace.yaml
-      - ./src/girder-virtual-resources:/girder-plugins/01-girder-virtual-resources
-      - ./src/girder-wholetale:/girder-plugins/02-girder-wholetale
+      - /home/xarth/codes/wholetale-ng/girder-virtual-resources:/girder-plugins/01-girder-virtual-resources
+      - /home/xarth/codes/whole-tale/girder-wholetale:/girder-plugins/02-girder-wholetale
       - /home/xarth/codes/htmdec/sem_viewer:/girder-plugins/03-girder-sem-viewer
       - /home/xarth/codes/htmdec/girder-sample-tracker:/girder-plugins/04-girder-sample-tracker
       - /home/xarth/codes/wholetale-ng/girder-jsonforms:/girder-plugins/05-girder-jsonforms
-      - /home/xarth/codes/xarthisius/girder-dataflows:/girder-plugins/06-girder-dataflows
-      - /home/xarth/codes/htmdec/table_view:/girder-plugins/07-girder-table-view
-     # - ./src/minio_assetstore:/girder/plugins/minio_assetstore
-     # - ./src/synced_folders:/girder/plugins/synced_folders
-     # - ./src/item_previews:/girder/plugins/item_previews
-      - ./src/gwvolman:/gwvolman
-      - ./src/girderfs:/girderfs
+      - /home/xarth/codes/wholetale-ng/girder-dashboards:/girder-plugins/06-girder-dashboards
+      - /home/xarth/codes/wholetale-ng/girder-dashboards-precipitate:/girder-plugins/07-girder-dashboards-precipitate
+        # - /home/xarth/codes/xarthisius/chameleon_plugin:/girder-plugins/06-girder-chameleon
+        #- /home/xarth/codes/xarthisius/girder-dataflows:/girder-plugins/06-girder-dataflows
+        #- /home/xarth/codes/htmdec/table_view:/girder-plugins/07-girder-table-view
+        # - /home/xarth/codes/wholetale-ng/girder/plugins/hashsum_download:/girder-plugins/08-girder-hashsum-download
+      - /home/xarth/codes/wholetale-ng/gwvolman:/gwvolman
+      - /home/xarth/codes/wholetale-ng/girderfs:/girderfs
+      - /tmp:/tmp
+    environment:
+      - DOMAIN=${domain}
+      - GIRDER_MONGO_URI=mongodb://mongo:27017/girder
+      - GIRDER_HOST=0.0.0.0
+      - GIRDER_WORKER_BROKER=redis://redis/
+      - GIRDER_WORKER_BACKEND=redis://redis/
+      - GIRDER_NOTIFICATION_REDIS_URL=redis://redis:6379/
+      - GOSU_USER=1001:1001:${docker_group}
+      - GIRDER_LOCAL_FONTELLO_ARCHIVE=/girder/clients/web/static/built/fontello.zip
+      - HOSTDIR=/
+    extra_hosts:
+      - "girder.${domain}:host-gateway" # for the local queue
+      - "images.${domain}:host-gateway"
+      - "minio.${domain}:host-gateway"
+    working_dir: /girder-plugins   # for reload
+    entrypoint: ["/sbin/tini", "--", "/docker-entrypoint-worker.sh"]
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+
+  girder:
+    image: xarthisius/girder:5-dev
+    networks:
+      - traefik-net
+      - celery
+      - mongo
+    volumes:
+      - ./volumes/base:/srv/data/base
+      - ./volumes/base:/volumes/base
+      - ./volumes/ps:/srv/data/ps
+      - ./volumes/runs:/srv/data/runs
+      - ./volumes/versions:/srv/data/versions
+      - ./volumes/homes:/srv/data/homes
+      - ./volumes/workspaces:/srv/data/workspaces
+      - ./workspace.yaml:/girder/workspace.yaml
+      - /home/xarth/codes/whole-tale/gwvolman:/gwvolman
+      - /home/xarth/codes/wholetale-ng/girder-virtual-resources:/girder-plugins/01-girder-virtual-resources
+      - /home/xarth/codes/whole-tale/girder-wholetale:/girder-plugins/02-girder-wholetale
+      # - /home/xarth/codes/htmdec/sem_viewer:/girder-plugins/03-girder-sem-viewer
+      - /home/xarth/codes/htmdec/girder-sample-tracker:/girder-plugins/04-girder-sample-tracker
+      - /home/xarth/codes/wholetale-ng/girder-jsonforms:/girder-plugins/05-girder-jsonforms
+      #- /home/xarth/codes/wholetale-ng/girder-dashboards:/girder-plugins/06-girder-dashboards
+      #- /home/xarth/codes/wholetale-ng/girder-dashboards-precipitate:/girder-plugins/07-girder-dashboards-precipitate
+      # - /home/xarth/codes/wholetale-ng/girder-collection-review:/girder-plugins/08-girder-collection-review
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp:/tmp
     environment:
+      - APP=girder_jsonforms.asgi:create_app()
       - DOMAIN=${domain}
       - DASHBOARD_URL=https://dashboard.${domain}
       - GIRDER_MONGO_URI=mongodb://mongo:27017/girder
       - GIRDER_HOST=0.0.0.0
       - GIRDER_WORKER_BROKER=redis://redis/
       - GIRDER_WORKER_BACKEND=redis://redis/
+      - GIRDER_NOTIFICATION_REDIS_URL=redis://redis:6379/
       - GOSU_USER=1001:1001:${docker_group}
       - GOSU_CHOWN=/srv/data
       - DATAONE_URL=https://cn-stage-2.test.dataone.org/cn
       - GIRDER_LOCAL_FONTELLO_ARCHIVE=/girder/clients/web/static/built/fontello.zip
       - HOSTDIR=/
+      - WATCHFILES_FORCE_POLLING=true
+    working_dir: /girder-plugins   # for reload
     extra_hosts:
+      - "girder.${domain}:host-gateway" # for the local queue
       - "images.${domain}:host-gateway"
       - "minio.${domain}:host-gateway"
+      - "influxdb.${domain}:host-gateway"
+    # entrypoint: ["/bin/sleep", "infinity"]
     deploy:
       replicas: 1
       labels:
@@ -130,6 +179,52 @@ services:
         - "traefik.docker.network=wt_traefik-net"
         - "traefik.http.middlewares.girder.forwardauth.address=http://girder:8080/api/v1/user/authorize/"
         - "traefik.http.middlewares.girder.forwardauth.trustforwardheader=true"
+
+  # Centralized IGSN registry: allocates sample identifiers and publishes them
+  # to DataCite on behalf of every Girder instance and any external project.
+  #
+  # Girder reaches it in-cluster as http://igsn:8000 (both are on traefik-net),
+  # so plugin traffic never leaves the overlay; the traefik router exists for the
+  # public resolver at igsn.${domain}, which is what published DOIs point at.
+  # The `mongo` network is only for its own database (`igsn` on the shared server).
+  #
+  # Dev setup mirrors `projects`: the sibling checkout is bind-mounted and the
+  # app runs with --reload, so host edits take effect. Production should run the
+  # image built from the repo's own Dockerfile rather than pip-installing on
+  # every start.
+  igsn:
+    image: python:3.12-slim
+    networks:
+      - traefik-net
+      - mongo
+    volumes:
+      - /home/xarth/codes/wholetale-ng/igsn-service:/app
+    working_dir: /app
+    environment:
+      - IGSN_MONGO_URI=mongodb://mongo:27017
+      - IGSN_MONGO_DB=igsn
+      - IGSN_PUBLIC_URL=https://igsn.${domain}
+      - IGSN_ADMIN_TOKEN=${igsn_admin_token}
+      - IGSN_LOG_LEVEL=INFO
+      # One env var per tenant, named by that tenant's `datacite.password_env`.
+      # DataCite passwords are deliberately not stored in Mongo.
+      - DATACITE_PW_HTMDEC=${datacite_pw_htmdec}
+      - DATACITE_PW_TEST=${datacite_pw_test}
+    command:
+      - "sh"
+      - "-c"
+      - "pip install --quiet -e '.[backfill]' && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.igsn.rule=Host(`igsn.${domain}`)"
+        - "traefik.http.routers.igsn.entrypoints=websecure"
+        - "traefik.http.routers.igsn.tls=true"
+        - "traefik.http.routers.igsn.tls.certresolver=default"
+        - "traefik.http.services.igsn.loadbalancer.server.port=8000"
+        - "traefik.http.services.igsn.loadbalancer.passhostheader=true"
+        - "traefik.docker.network=wt_traefik-net"
 
   logger:
     image: xarthisius/wt-instance-logger:latest
@@ -152,7 +247,7 @@ services:
         - "traefik.enable=false"
 
   dashboard:
-    image: xarthisius/wt-dashboard:latest
+    image: wholetale/ngx-dashboard:latest 
     networks:
       - traefik-net
     environment:
@@ -171,8 +266,8 @@ services:
         - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
         - "traefik.http.services.dashboard.loadbalancer.passhostheader=true"
         - "traefik.docker.network=wt_traefik-net"
-    volumes:
-      - ./src/ngx-dashboard/dist/browser/:/usr/share/nginx/html/
+          #volumes:
+          #- ./src/ngx-dashboard/dist/browser/:/usr/share/nginx/html/
 
   instance-errors:
     image: xarthisius/wt-custom-errors:latest
@@ -254,12 +349,13 @@ services:
       - WT_VOLUMES_PATH=${PWD}/volumes
       - MATLAB_FILE_INSTALLATION_KEY=${matlab_file_installation_key}
       - SWARM_NODE_ID={{.Node.ID}}
-      - BUILDER_URL=https://builder.${domain}
+        # - BUILDER_URL=https://builder.${domain}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./volumes/tmp:/var/tmp
       - ./volumes/tmp:/tmp
-      - ./src/gwvolman:/gwvolman
-      - ./src/girderfs:/girderfs
+      - /home/xarth/codes/whole-tale/gwvolman:/gwvolman
+      - /home/xarth/codes/wholetale-ng/girderfs:/girderfs
       - type: bind
         source: ${PWD}/volumes
         target: ${PWD}/volumes
@@ -276,101 +372,12 @@ services:
         - "traefik.enable=true"
     command: -c 3
 
-  postgresql:
-    image: postgres:11
-    deploy:
-      replicas: 0
-    networks:
-      - dagster
-    environment:
-      - POSTGRES_USER=postgres_user
-      - POSTGRES_PASSWORD=postgres_password
-      - POSTGRES_DB=postgres_db
-
-  dagster_web:
-    image: xarthisius/dagster:latest
-    depends_on:
-      - postgresql
-    entrypoint: ["dagster-webserver", "-h", "0.0.0.0", "-p", "3000", "-w", "workspace.yaml"]
-    networks:
-      - traefik-net
-      - dagster
-    deploy:
-      replicas: 0
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.dagster.rule=Host(`dagster.${domain}`)"
-        - "traefik.http.routers.dagster.entrypoints=websecure"
-        - "traefik.http.routers.dagster.tls=true"
-        - "traefik.http.services.dagster.loadbalancer.server.port=3000"
-        - "traefik.http.services.dagster.loadbalancer.passhostheader=true"
-        - "traefik.docker.network=wt_traefik-net"
-    environment:
-      - DAGSTER_POSTGRES_USER=postgres_user
-      - DAGSTER_POSTGRES_PASSWORD=postgres_password
-      - DAGSTER_POSTGRES_DB=postgres_db
-    extra_hosts:
-      - "girder.${domain}:host-gateway"
-    volumes:
-      - ./workspace.yaml:/opt/dagster/dagster_home/workspace.yaml
-      - ./dagster.yaml:/opt/dagster/dagster_home/dagster.yaml
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./volumes/io_manager_storage:/tmp/io_manager_storage
-
-  dagster_daemon:
-    image: xarthisius/dagster:latest
-    entrypoint: ["dagster-daemon", "run"]
-    environment:
-      - DAGSTER_POSTGRES_USER=postgres_user
-      - DAGSTER_POSTGRES_PASSWORD=postgres_password
-      - DAGSTER_POSTGRES_DB=postgres_db
-    volumes:
-      - ./workspace.yaml:/opt/dagster/dagster_home/workspace.yaml
-      - ./dagster.yaml:/opt/dagster/dagster_home/dagster.yaml
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./volumes/io_manager_storage:/tmp/io_manager_storage
-    extra_hosts:
-      - "girder.${domain}:host-gateway"
-    networks:
-      - dagster
-    deploy:
-      replicas: 0
-      labels:
-        - "traefik.enable=false"
-  
-  remote_builder:
-    image: xarthisius/remote_builder:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - traefik-net
-    environment:
-      - WEB_CONCURRENCY=2
-    deploy:
-      replicas: 1
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.builder.rule=Host(`builder.${domain}`)"
-        - "traefik.http.routers.builder.entrypoints=websecure"
-        - "traefik.http.routers.builder.tls=true"
-        - "traefik.http.services.builder.loadbalancer.server.port=8000"
-        - "traefik.http.services.builder.loadbalancer.passhostheader=true"
-        - "traefik.docker.network=wt_traefik-net"
-    extra_hosts:
-      - "images.${domain}:host-gateway"
-      - "registry.${domain}:host-gateway"
-      - "girder.${domain}:host-gateway"
-      - "builder.${domain}:host-gateway"
-
 networks:
   traefik-net:
     driver: overlay
   mongo:
     driver: overlay
   celery:
-    driver: overlay
-    attachable: true
-  dagster:
     driver: overlay
     attachable: true
 

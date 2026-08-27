@@ -60,7 +60,10 @@ print("Setting up Plugin")
 settings = [
     {
         "key": "core.cors.allow_origin",
-        "value": f"https://dashboard.{domain},http://localhost:4200,http://localhost:5173",
+        "value": (
+            f"https://dashboard.{domain},https://projects.{domain}"
+            ",http://localhost:4200,http://localhost:5173"
+        ),
     },
     {
         "key": "core.cors.allow_headers",
@@ -72,6 +75,11 @@ settings = [
         ),
     },
     {"key": "core.cookie_domain", "value": f".{domain}"},
+    # Girder builds absolute links off this. Left unset it defaults to empty,
+    # and anything joining it into a URL silently produces a relative one --
+    # which is how an IGSN landing page went to DataCite as "#igsn/JHBBMX00001"
+    # and came back 422 "URL is not valid".
+    {"key": "core.server_root", "value": f"https://girder.{domain}"},
     {"key": "oauth.globus_client_id", "value": os.environ.get("GLOBUS_CLIENT_ID")},
     {
         "key": "oauth.globus_client_secret",
@@ -82,7 +90,7 @@ settings = [
         "key": "oauth.orcid_client_secret",
         "value": os.environ.get("ORCID_CLIENT_SECRET"),
     },
-    {"key": "oauth.providers_enabled", "value": ["globus"]},
+    {"key": "oauth.providers_enabled", "value": ["globus", "orcid"]},
     # {"key": "dm.globus_gc_dir", "value": "/opt/globusconnectpersonal"},
     # {
     #    "key": "wholetale.zenodo_extra_hosts",
@@ -97,6 +105,33 @@ settings = [
     {"key": "wholetale.catalog_link_title", "value": "Data Catalog"},
     {"key": "wholetale.enable_data_catalog", "value": True},
 ]
+
+# Centralized IGSN registry. Leaving IGSN_SERVICE_TOKEN unset keeps this Girder
+# in local mode, where it allocates identifiers from its own counter exactly as
+# it always has -- which is what you want until the registry has been backfilled
+# from every instance. To switch over, mint a token with
+#
+#     docker exec -it $(docker ps -qf name=wt_igsn) \
+#         igsn-service create-tenant --slug dev-girder --name 'Dev Girder' \
+#         --doi-prefix 10.83961 --repository-id jhu.igsn-test \
+#         --password-env DATACITE_PW_TEST --api-base https://api.test.datacite.org \
+#         --landing-template "https://girder.${domain}/#igsn/{igsn}"
+#
+# and put it in .env as igsn_service_token.
+igsn_service_token = os.environ.get("IGSN_SERVICE_TOKEN")
+if igsn_service_token:
+    settings += [
+        # In-cluster address: both services sit on traefik-net, so plugin
+        # traffic skips the proxy. The public igsn.<domain> router is for the
+        # resolver that published DOIs point at.
+        {"key": "jsonforms.igsn_service_url", "value": "http://igsn:8000"},
+        {"key": "jsonforms.igsn_service_token", "value": igsn_service_token},
+    ]
+else:
+    print(
+        "IGSN_SERVICE_TOKEN is unset; leaving Girder in local IGSN mode "
+        "(it will allocate identifiers from its own counter)."
+    )
 
 r = requests.put(
     api_url + "/system/setting", headers=headers, params={"list": json.dumps(settings)}
