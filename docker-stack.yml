@@ -105,7 +105,7 @@ services:
       - "images.${domain}:host-gateway"
       - "minio.${domain}:host-gateway"
     working_dir: /girder-plugins   # for reload
-    entrypoint: ["/sbin/tini", "--", "/docker-entrypoint-worker.sh"]
+    entrypoint: ["/usr/bin/tini", "--", "/docker-entrypoint-worker.sh"]
     deploy:
       replicas: 1
       labels:
