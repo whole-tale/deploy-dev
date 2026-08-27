@@ -41,7 +41,7 @@ services:
     networks:
       - traefik-net
     volumes:
-      - /home/xarth/codes/hemi-ncsa-dt/aimdl-projects:/srv
+      - ./src/aimdl-projects:/srv
     deploy:
       replicas: 1
       labels:
@@ -80,20 +80,15 @@ services:
       - mongo
     volumes:
       - ./volumes:/srv/data
-      - ./workspace.yaml:/girder/workspace.yaml
-      - /home/xarth/codes/wholetale-ng/girder-virtual-resources:/girder-plugins/01-girder-virtual-resources
-      - /home/xarth/codes/whole-tale/girder-wholetale:/girder-plugins/02-girder-wholetale
-      - /home/xarth/codes/htmdec/sem_viewer:/girder-plugins/03-girder-sem-viewer
-      - /home/xarth/codes/htmdec/girder-sample-tracker:/girder-plugins/04-girder-sample-tracker
-      - /home/xarth/codes/wholetale-ng/girder-jsonforms:/girder-plugins/05-girder-jsonforms
-      - /home/xarth/codes/wholetale-ng/girder-dashboards:/girder-plugins/06-girder-dashboards
-      - /home/xarth/codes/wholetale-ng/girder-dashboards-precipitate:/girder-plugins/07-girder-dashboards-precipitate
-        # - /home/xarth/codes/xarthisius/chameleon_plugin:/girder-plugins/06-girder-chameleon
-        #- /home/xarth/codes/xarthisius/girder-dataflows:/girder-plugins/06-girder-dataflows
-        #- /home/xarth/codes/htmdec/table_view:/girder-plugins/07-girder-table-view
-        # - /home/xarth/codes/wholetale-ng/girder/plugins/hashsum_download:/girder-plugins/08-girder-hashsum-download
-      - /home/xarth/codes/wholetale-ng/gwvolman:/gwvolman
-      - /home/xarth/codes/wholetale-ng/girderfs:/girderfs
+      - ./src/girder-virtual-resources:/girder-plugins/01-girder-virtual-resources
+      - ./src/girder-wholetale:/girder-plugins/02-girder-wholetale
+      - ./src/girder-sem-viewer:/girder-plugins/03-girder-sem-viewer
+      - ./src/girder-sample-tracker:/girder-plugins/04-girder-sample-tracker
+      - ./src/girder-jsonforms:/girder-plugins/05-girder-jsonforms
+      - ./src/girder-dashboards:/girder-plugins/06-girder-dashboards
+      - ./src/girder-dashboards-precipitate:/girder-plugins/07-girder-dashboards-precipitate
+      - ./src/gwvolman:/gwvolman
+      - ./src/girderfs:/girderfs
       - /tmp:/tmp
     environment:
       - DOMAIN=${domain}
@@ -130,16 +125,16 @@ services:
       - ./volumes/versions:/srv/data/versions
       - ./volumes/homes:/srv/data/homes
       - ./volumes/workspaces:/srv/data/workspaces
-      - ./workspace.yaml:/girder/workspace.yaml
-      - /home/xarth/codes/whole-tale/gwvolman:/gwvolman
-      - /home/xarth/codes/wholetale-ng/girder-virtual-resources:/girder-plugins/01-girder-virtual-resources
-      - /home/xarth/codes/whole-tale/girder-wholetale:/girder-plugins/02-girder-wholetale
-      # - /home/xarth/codes/htmdec/sem_viewer:/girder-plugins/03-girder-sem-viewer
-      - /home/xarth/codes/htmdec/girder-sample-tracker:/girder-plugins/04-girder-sample-tracker
-      - /home/xarth/codes/wholetale-ng/girder-jsonforms:/girder-plugins/05-girder-jsonforms
-      #- /home/xarth/codes/wholetale-ng/girder-dashboards:/girder-plugins/06-girder-dashboards
-      #- /home/xarth/codes/wholetale-ng/girder-dashboards-precipitate:/girder-plugins/07-girder-dashboards-precipitate
-      # - /home/xarth/codes/wholetale-ng/girder-collection-review:/girder-plugins/08-girder-collection-review
+      - ./src/girder-virtual-resources:/girder-plugins/01-girder-virtual-resources
+      - ./src/girder-wholetale:/girder-plugins/02-girder-wholetale
+      - ./src/girder-sem-viewer:/girder-plugins/03-girder-sem-viewer
+      - ./src/girder-sample-tracker:/girder-plugins/04-girder-sample-tracker
+      - ./src/girder-jsonforms:/girder-plugins/05-girder-jsonforms
+      - ./src/girder-dashboards:/girder-plugins/06-girder-dashboards
+      - ./src/girder-dashboards-precipitate:/girder-plugins/07-girder-dashboards-precipitate
+      - ./src/gwvolman:/gwvolman
+      - ./src/girderfs:/girderfs
+      - /tmp:/tmp
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp:/tmp
     environment:
@@ -192,39 +187,39 @@ services:
   # app runs with --reload, so host edits take effect. Production should run the
   # image built from the repo's own Dockerfile rather than pip-installing on
   # every start.
-  igsn:
-    image: python:3.12-slim
-    networks:
-      - traefik-net
-      - mongo
-    volumes:
-      - /home/xarth/codes/wholetale-ng/igsn-service:/app
-    working_dir: /app
-    environment:
-      - IGSN_MONGO_URI=mongodb://mongo:27017
-      - IGSN_MONGO_DB=igsn
-      - IGSN_PUBLIC_URL=https://igsn.${domain}
-      - IGSN_ADMIN_TOKEN=${igsn_admin_token}
-      - IGSN_LOG_LEVEL=INFO
-      # One env var per tenant, named by that tenant's `datacite.password_env`.
-      # DataCite passwords are deliberately not stored in Mongo.
-      - DATACITE_PW_HTMDEC=${datacite_pw_htmdec}
-      - DATACITE_PW_TEST=${datacite_pw_test}
-    command:
-      - "sh"
-      - "-c"
-      - "pip install --quiet -e '.[backfill]' && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
-    deploy:
-      replicas: 1
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.igsn.rule=Host(`igsn.${domain}`)"
-        - "traefik.http.routers.igsn.entrypoints=websecure"
-        - "traefik.http.routers.igsn.tls=true"
-        - "traefik.http.routers.igsn.tls.certresolver=default"
-        - "traefik.http.services.igsn.loadbalancer.server.port=8000"
-        - "traefik.http.services.igsn.loadbalancer.passhostheader=true"
-        - "traefik.docker.network=wt_traefik-net"
+  #igsn:
+  #  image: python:3.12-slim
+  #  networks:
+  #    - traefik-net
+  #    - mongo
+  #  volumes:
+  #    - /home/xarth/codes/wholetale-ng/igsn-service:/app
+  #  working_dir: /app
+  #  environment:
+  #    - IGSN_MONGO_URI=mongodb://mongo:27017
+  #    - IGSN_MONGO_DB=igsn
+  #    - IGSN_PUBLIC_URL=https://igsn.${domain}
+  #    - IGSN_ADMIN_TOKEN=${igsn_admin_token}
+  #    - IGSN_LOG_LEVEL=INFO
+  #    # One env var per tenant, named by that tenant's `datacite.password_env`.
+  #    # DataCite passwords are deliberately not stored in Mongo.
+  #    - DATACITE_PW_HTMDEC=${datacite_pw_htmdec}
+  #    - DATACITE_PW_TEST=${datacite_pw_test}
+  #  command:
+  #    - "sh"
+  #    - "-c"
+  #    - "pip install --quiet -e '.[backfill]' && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+  #  deploy:
+  #    replicas: 0
+  #    labels:
+  #      - "traefik.enable=true"
+  #      - "traefik.http.routers.igsn.rule=Host(`igsn.${domain}`)"
+  #      - "traefik.http.routers.igsn.entrypoints=websecure"
+  #      - "traefik.http.routers.igsn.tls=true"
+  #      - "traefik.http.routers.igsn.tls.certresolver=default"
+  #      - "traefik.http.services.igsn.loadbalancer.server.port=8000"
+  #      - "traefik.http.services.igsn.loadbalancer.passhostheader=true"
+  #      - "traefik.docker.network=wt_traefik-net"
 
   logger:
     image: xarthisius/wt-instance-logger:latest
@@ -354,8 +349,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./volumes/tmp:/var/tmp
       - ./volumes/tmp:/tmp
-      - /home/xarth/codes/whole-tale/gwvolman:/gwvolman
-      - /home/xarth/codes/wholetale-ng/girderfs:/girderfs
+      - ./src/gwvolman:/gwvolman
+      - ./src/girderfs:/girderfs
       - type: bind
         source: ${PWD}/volumes
         target: ${PWD}/volumes

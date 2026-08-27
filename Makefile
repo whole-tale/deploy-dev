@@ -10,15 +10,18 @@ NG = ${NODE} ./node_modules/@angular/cli/bin/ng
 YARN = /usr/local/bin/yarn
 
 images:
-	docker pull traefik:alpine
+	docker pull traefik:v3.6
+	docker pull node:22-bookworm
 	docker pull mongo:4.4
-	docker pull redis:latest
-	docker pull registry:2.6
-	docker pull node:carbon-slim
-	docker pull xarthisius/girder:$(TAG)
-	docker pull xarthisius/gwvolman:$(TAG)
+	docker pull redis:7-bullseye
+	docker pull registry:2.8
+	docker pull python:3.12-slim
+	docker pull xarthisius/wt-instance-logger:latest
+	docker pull xarthisius/wt-custom-errors:latest
+	docker pull xarthisius/girder:5-dev
+	docker pull xarthisius/gwvolman:latest
 	docker pull xarthisius/repo2docker_wholetale:$(TAG)
-	docker pull xarthisius/ngx-dashboard:$(TAG)
+	docker pull wholetale/ngx-dashboard:latest
 
 .env:
 	curl -s -o .env https://wt.xarthisius.xyz/wt_local_env
@@ -34,43 +37,40 @@ traefik/certs/privkey.pem: traefik/certs
 
 certs: .env traefik/certs/fullchain.pem traefik/certs/privkey.pem
 
-src/sem_viewer:
-	git clone https://github.com/htmdec/sem_viewer src/sem_viewer
+src/aimdl-projects:
+	git clone https://github.com/hemi-ncsa-dt/aimdl-projects src/aimdl-projects
 
-src/table_view:
-	git clone https://github.com/htmdec/table_view src/table_view
+src/girder-sem-viewer:
+	git clone https://github.com/htmdec/girder-sem-viewer src/girder-sem-viewer
 
-src/synced_folders:
-	git clone https://github.com/whole-tale/synced_folders src/synced_folders
+src/girder-sample-tracker:
+	git clone https://github.com/htmdec/girder-sample-tracker src/girder-sample-tracker
+
+src/girder-jsonforms:
+	git clone https://github.com/Xarthisius/girder-jsonforms -b igsn src/girder-jsonforms
+
+src/girder-dashboards:
+	git clone https://github.com/Xarthisius/girder-dashboards src/girder-dashboards
+
+src/girder-dashboards-precipitate:
+	git clone https://github.com/imqcam/girder-dashboards-precipitate src/girder-dashboards-precipitate
 
 src/girderfs:
-	git clone https://github.com/whole-tale/girderfs src/girderfs
+	git clone https://github.com/Xarthisius/girderfs src/girderfs
 
 src/gwvolman:
 	git clone https://github.com/whole-tale/gwvolman src/gwvolman
 
-src/wholetale:
-	git clone https://github.com/whole-tale/girder_wholetale src/wholetale
+src/girder-wholetale:
+	git clone https://github.com/whole-tale/girder-wholetale src/girder-wholetale
 
-src/wt_data_manager:
-	git clone https://github.com/whole-tale/girder_wt_data_manager src/wt_data_manager
-
-src/wt_home_dir:
-	git clone https://github.com/whole-tale/wt_home_dirs src/wt_home_dir
-
-src/wt_versioning:
-	git clone https://github.com/whole-tale/wt_versioning src/wt_versioning
-
-src/virtual_resources:
-	git clone https://github.com/whole-tale/virtual_resources src/virtual_resources
-
-src/globus_handler:
-	git clone https://github.com/whole-tale/globus_handler src/globus_handler
+src/girder-virtual-resources:
+	git clone https://github.com/Xarthisius/girder-virtual-resources src/girder-virtual-resources
 
 src/ngx-dashboard:
 	git clone https://github.com/whole-tale/ngx-dashboard src/ngx-dashboard
 
-sources_wt: src src/gwvolman src/wholetale src/wt_data_manager src/wt_home_dir src/globus_handler src/girderfs src/ngx-dashboard src/virtual_resources src/wt_versioning src/sem_viewer src/table_view src/synced_folders certs
+sources_wt: src src/gwvolman src/girder-wholetale src/girderfs src/ngx-dashboard src/girder-virtual-resources src/girder-sem-viewer src/aimdl-projects src/girder-sample-tracker src/girder-jsonforms src/girder-dashboards src/girder-dashboards-precipitate certs
 
 dirs: $(SUBDIRS)
 
