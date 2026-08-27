@@ -39,6 +39,15 @@ certs: .env traefik/certs/fullchain.pem traefik/certs/privkey.pem
 
 src/aimdl-projects:
 	git clone https://github.com/hemi-ncsa-dt/aimdl-projects src/aimdl-projects
+	docker run \
+		--rm \
+		--user=$${UID}:$${GID} \
+		-ti \
+		-e NODE_OPTIONS=--max-old-space-size=4096 \
+		-v $${PWD}/src/aimdl-projects:/srv/app \
+		--entrypoint /bin/sh \
+		-w /srv/app node:22-bookworm \
+			-c 'npm ci --only=production=false'
 
 src/girder-sem-viewer:
 	git clone https://github.com/htmdec/girder-sem-viewer src/girder-sem-viewer
