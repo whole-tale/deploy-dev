@@ -134,7 +134,6 @@ services:
       - ./src/girder-dashboards-precipitate:/girder-plugins/07-girder-dashboards-precipitate
       - ./src/gwvolman:/gwvolman
       - ./src/girderfs:/girderfs
-      - /tmp:/tmp
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp:/tmp
     environment:
