@@ -75,7 +75,7 @@ sources_wt: src src/gwvolman src/girder-wholetale src/girderfs src/ngx-dashboard
 dirs: $(SUBDIRS)
 
 $(SUBDIRS):
-	@sudo mkdir -p $@
+	@mkdir -p $@
 
 services: dirs sources_wt
 
