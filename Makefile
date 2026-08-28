@@ -2,6 +2,11 @@
 	rebuild_dashboard watch_dashboard \
 	restart_worker restart_girder globus_handler_src status update_src certs
 
+# Source .env, then the gitignored .env.local, so machine-specific overrides win
+# over the shared defaults. Use it for the src_* variables in docker-stack.yml to
+# point a plugin mount at a local checkout instead of the clone under ./src.
+ENV = { [ -f ./.env ] && . ./.env; [ -f ./.env.local ] && . ./.env.local; true; }
+
 SUBDIRS = src volumes/ps volumes/workspaces volumes/homes volumes/base volumes/versions volumes/runs volumes/licenses volumes/mountpoints volumes/tmp volumes/minio
 TAG = latest
 MEM_LIMIT = 2048
@@ -50,31 +55,31 @@ src/aimdl-projects:
 			-c 'npm ci --only=production=false'
 
 src/girder-sem-viewer:
-	git clone https://github.com/htmdec/girder-sem-viewer src/girder-sem-viewer
+	@$(ENV); [ -n "$$src_girder_sem_viewer" ] || git clone https://github.com/htmdec/girder-sem-viewer src/girder-sem-viewer
 
 src/girder-sample-tracker:
-	git clone https://github.com/htmdec/girder-sample-tracker src/girder-sample-tracker
+	@$(ENV); [ -n "$$src_girder_sample_tracker" ] || git clone https://github.com/htmdec/girder-sample-tracker src/girder-sample-tracker
 
 src/girder-jsonforms:
-	git clone https://github.com/Xarthisius/girder-jsonforms -b igsn src/girder-jsonforms
+	@$(ENV); [ -n "$$src_girder_jsonforms" ] || git clone https://github.com/Xarthisius/girder-jsonforms -b igsn src/girder-jsonforms
 
 src/girder-dashboards:
-	git clone https://github.com/Xarthisius/girder-dashboards src/girder-dashboards
+	@$(ENV); [ -n "$$src_girder_dashboards" ] || git clone https://github.com/Xarthisius/girder-dashboards src/girder-dashboards
 
 src/girder-dashboards-precipitate:
-	git clone https://github.com/imqcam/girder-dashboards-precipitate src/girder-dashboards-precipitate
+	@$(ENV); [ -n "$$src_girder_dashboards_precipitate" ] || git clone https://github.com/imqcam/girder-dashboards-precipitate src/girder-dashboards-precipitate
 
 src/girderfs:
-	git clone https://github.com/Xarthisius/girderfs src/girderfs
+	@$(ENV); [ -n "$$src_girderfs" ] || git clone https://github.com/Xarthisius/girderfs src/girderfs
 
 src/gwvolman:
-	git clone https://github.com/whole-tale/gwvolman src/gwvolman
+	@$(ENV); [ -n "$$src_gwvolman" ] || git clone https://github.com/whole-tale/gwvolman src/gwvolman
 
 src/girder-wholetale:
-	git clone https://github.com/whole-tale/girder-wholetale src/girder-wholetale
+	@$(ENV); [ -n "$$src_girder_wholetale" ] || git clone https://github.com/whole-tale/girder-wholetale src/girder-wholetale
 
 src/girder-virtual-resources:
-	git clone https://github.com/Xarthisius/girder-virtual-resources src/girder-virtual-resources
+	@$(ENV); [ -n "$$src_girder_virtual_resources" ] || git clone https://github.com/Xarthisius/girder-virtual-resources src/girder-virtual-resources
 
 src/ngx-dashboard:
 	git clone https://github.com/whole-tale/ngx-dashboard src/ngx-dashboard
@@ -89,7 +94,7 @@ $(SUBDIRS):
 services: dirs sources_wt
 
 dev: services
-	. ./.env && docker stack config --compose-file docker-stack.yml | docker stack deploy --compose-file - wt
+	$(ENV); docker stack config --compose-file docker-stack.yml | docker stack deploy --compose-file - wt
 	cid=$$(docker ps --filter=name=wt_girder -q);
 	while [ -z $${cid} ] ; do \
 		  echo $${cid} ; \
@@ -97,7 +102,7 @@ dev: services
 	    cid=$$(docker ps --filter=name=wt_girder -q) ; \
 	done; \
 	true
-	. ./.env && ./setup_girder.py
+	$(ENV); ./setup_girder.py
 
 restart_girder:
 	docker exec --user=root -ti $$(docker ps --filter=name=wt_girder -q) touch /venv/lib/python3.12/site-packages/requests/__init__.py

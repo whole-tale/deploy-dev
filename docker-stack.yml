@@ -80,15 +80,15 @@ services:
       - mongo
     volumes:
       - ./volumes:/srv/data
-      - ./src/girder-virtual-resources:/girder-plugins/01-girder-virtual-resources
-      - ./src/girder-wholetale:/girder-plugins/02-girder-wholetale
-      - ./src/girder-sem-viewer:/girder-plugins/03-girder-sem-viewer
-      - ./src/girder-sample-tracker:/girder-plugins/04-girder-sample-tracker
-      - ./src/girder-jsonforms:/girder-plugins/05-girder-jsonforms
-      - ./src/girder-dashboards:/girder-plugins/06-girder-dashboards
-      - ./src/girder-dashboards-precipitate:/girder-plugins/07-girder-dashboards-precipitate
-      - ./src/gwvolman:/gwvolman
-      - ./src/girderfs:/girderfs
+      - ${src_girder_virtual_resources:-./src/girder-virtual-resources}:/girder-plugins/01-girder-virtual-resources
+      - ${src_girder_wholetale:-./src/girder-wholetale}:/girder-plugins/02-girder-wholetale
+      - ${src_girder_sem_viewer:-./src/girder-sem-viewer}:/girder-plugins/03-girder-sem-viewer
+      - ${src_girder_sample_tracker:-./src/girder-sample-tracker}:/girder-plugins/04-girder-sample-tracker
+      - ${src_girder_jsonforms:-./src/girder-jsonforms}:/girder-plugins/05-girder-jsonforms
+      - ${src_girder_dashboards:-./src/girder-dashboards}:/girder-plugins/06-girder-dashboards
+      - ${src_girder_dashboards_precipitate:-./src/girder-dashboards-precipitate}:/girder-plugins/07-girder-dashboards-precipitate
+      - ${src_gwvolman:-./src/gwvolman}:/gwvolman
+      - ${src_girderfs:-./src/girderfs}:/girderfs
       - /tmp:/tmp
     environment:
       - DOMAIN=${domain}
@@ -125,15 +125,15 @@ services:
       - ./volumes/versions:/srv/data/versions
       - ./volumes/homes:/srv/data/homes
       - ./volumes/workspaces:/srv/data/workspaces
-      - ./src/girder-virtual-resources:/girder-plugins/01-girder-virtual-resources
-      - ./src/girder-wholetale:/girder-plugins/02-girder-wholetale
-      - ./src/girder-sem-viewer:/girder-plugins/03-girder-sem-viewer
-      - ./src/girder-sample-tracker:/girder-plugins/04-girder-sample-tracker
-      - ./src/girder-jsonforms:/girder-plugins/05-girder-jsonforms
-      - ./src/girder-dashboards:/girder-plugins/06-girder-dashboards
-      - ./src/girder-dashboards-precipitate:/girder-plugins/07-girder-dashboards-precipitate
-      - ./src/gwvolman:/gwvolman
-      - ./src/girderfs:/girderfs
+      - ${src_girder_virtual_resources:-./src/girder-virtual-resources}:/girder-plugins/01-girder-virtual-resources
+      - ${src_girder_wholetale:-./src/girder-wholetale}:/girder-plugins/02-girder-wholetale
+      - ${src_girder_sem_viewer:-./src/girder-sem-viewer}:/girder-plugins/03-girder-sem-viewer
+      - ${src_girder_sample_tracker:-./src/girder-sample-tracker}:/girder-plugins/04-girder-sample-tracker
+      - ${src_girder_jsonforms:-./src/girder-jsonforms}:/girder-plugins/05-girder-jsonforms
+      - ${src_girder_dashboards:-./src/girder-dashboards}:/girder-plugins/06-girder-dashboards
+      - ${src_girder_dashboards_precipitate:-./src/girder-dashboards-precipitate}:/girder-plugins/07-girder-dashboards-precipitate
+      - ${src_gwvolman:-./src/gwvolman}:/gwvolman
+      - ${src_girderfs:-./src/girderfs}:/girderfs
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp:/tmp
     environment:
@@ -348,8 +348,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./volumes/tmp:/var/tmp
       - ./volumes/tmp:/tmp
-      - ./src/gwvolman:/gwvolman
-      - ./src/girderfs:/girderfs
+      - ${src_gwvolman:-./src/gwvolman}:/gwvolman
+      - ${src_girderfs:-./src/girderfs}:/girderfs
       - type: bind
         source: ${PWD}/volumes
         target: ${PWD}/volumes

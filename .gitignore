@@ -6,3 +6,4 @@ traefik/acme
 traefik/certs/*.pem
 homes/*
 ps/*
+.env.local
