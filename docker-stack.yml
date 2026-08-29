@@ -41,7 +41,7 @@ services:
     networks:
       - traefik-net
     volumes:
-      - ./src/aimdl-projects:/srv
+      - ${src_aimdl_projects:-./src/aimdl-projects}:/srv
     deploy:
       replicas: 1
       labels:
@@ -244,6 +244,8 @@ services:
     image: wholetale/ngx-dashboard:latest 
     networks:
       - traefik-net
+    volumes:
+      - ${src_dashboard_dist:-./src/ngx-dashboard/dist/browser}:/usr/share/nginx/html/
     environment:
       - GIRDER_API_URL=https://girder.${domain}/api/v1
       - AUTH_PROVIDER=Globus
@@ -260,8 +262,6 @@ services:
         - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
         - "traefik.http.services.dashboard.loadbalancer.passhostheader=true"
         - "traefik.docker.network=wt_traefik-net"
-          #volumes:
-          #- ./src/ngx-dashboard/dist/browser/:/usr/share/nginx/html/
 
   instance-errors:
     image: xarthisius/wt-custom-errors:latest
