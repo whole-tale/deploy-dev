@@ -57,6 +57,22 @@ r = requests.post(
 
 print("Setting up Plugin")
 
+# ORCID and its sandbox are separate OAuth providers with separate client
+# credentials and separate callback URLs; both can be enabled at once. The
+# sandbox one only shows up if its credentials are in the environment.
+enabled_oauth_providers = ["globus", "orcid"]
+jsonforms_orcid_provider = "orcid"
+jsonforms_research_resources = False
+if os.environ.get("ORCID_SANDBOX_CLIENT_ID"):
+    enabled_oauth_providers.append("orcid_sandbox")
+    # girder-jsonforms defaults to production ORCID with research-resource
+    # registration off, because only the sandbox has the "/activities/update"
+    # scope that write needs. Configuring sandbox credentials on a dev stack
+    # means we want both pointed at the sandbox, so the feature stays
+    # exercised somewhere. Drop the second line to leave it off in dev too.
+    jsonforms_orcid_provider = "orcid_sandbox"
+    jsonforms_research_resources = True
+
 settings = [
     {
         "key": "core.cors.allow_origin",
@@ -90,7 +106,20 @@ settings = [
         "key": "oauth.orcid_client_secret",
         "value": os.environ.get("ORCID_CLIENT_SECRET"),
     },
-    {"key": "oauth.providers_enabled", "value": ["globus", "orcid"]},
+    {
+        "key": "oauth.orcid_sandbox_client_id",
+        "value": os.environ.get("ORCID_SANDBOX_CLIENT_ID", ""),
+    },
+    {
+        "key": "oauth.orcid_sandbox_client_secret",
+        "value": os.environ.get("ORCID_SANDBOX_CLIENT_SECRET", ""),
+    },
+    {"key": "oauth.providers_enabled", "value": enabled_oauth_providers},
+    {"key": "jsonforms.orcid_provider", "value": jsonforms_orcid_provider},
+    {
+        "key": "jsonforms.orcid_research_resources",
+        "value": jsonforms_research_resources,
+    },
     # {"key": "dm.globus_gc_dir", "value": "/opt/globusconnectpersonal"},
     # {
     #    "key": "wholetale.zenodo_extra_hosts",
